@@ -2,64 +2,64 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Simulateur : Bulle de Filtre Ultime</title>
+    <title>Simulateur : Bulle de Filtre Longue Durée</title>
     <style>
         :root { --bg: #f0f2f5; --night-dark: #1a1a2e; --sims-green: #78fe00; --fb-blue: #1877f2; }
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); overflow: hidden; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); overflow: hidden; height: 100vh; }
         .app-container { display: flex; height: 100vh; }
         
-        /* SIDEBAR 1/3 */
-        .sidebar { width: 33%; background: white; border-right: 1px solid #ddd; padding: 20px; display: flex; flex-direction: column; }
-        .dash-table { width: 100%; border-collapse: collapse; }
-        .dash-table th { text-align: left; font-size: 0.65rem; color: #65676b; text-transform: uppercase; padding-bottom: 10px; }
-        .dash-row td { padding: 6px 0; border-bottom: 1px solid #f0f2f5; vertical-align: middle; }
-        .theme-label { font-weight: 600; font-size: 0.8rem; width: 110px; }
-        .bar-bg { background: #e4e6eb; height: 8px; border-radius: 4px; overflow: hidden; width: 80px; }
+        /* SIDEBAR ÉTIRÉE */
+        .sidebar { width: 33%; background: white; border-right: 1px solid #ddd; padding: 25px; display: flex; flex-direction: column; justify-content: space-between; }
+        .dash-table { width: 100%; border-collapse: collapse; flex-grow: 1; margin: 20px 0; }
+        .dash-table th { text-align: left; font-size: 0.7rem; color: #65676b; text-transform: uppercase; padding-bottom: 10px; }
+        .dash-row td { padding: 12px 0; border-bottom: 1px solid #f0f2f5; vertical-align: middle; }
+        .theme-label { font-weight: 600; font-size: 0.9rem; }
+        .bar-bg { background: #e4e6eb; height: 12px; border-radius: 6px; overflow: hidden; width: 100px; }
         .bar-fill { background: #6366f1; height: 100%; transition: width 0.8s; }
-        .gauge-track { height: 8px; background: linear-gradient(to right, #a855f7, #e2e8f0 50%, #f97316); border-radius: 4px; position: relative; width: 100px; }
-        .gauge-cursor { position: absolute; width: 4px; height: 14px; background: #000; top: -3px; left: 50%; transition: left 0.8s; border: 1px solid white; }
+        .gauge-track { height: 12px; background: linear-gradient(to right, #a855f7, #e2e8f0 50%, #f97316); border-radius: 6px; position: relative; width: 120px; }
+        .gauge-cursor { position: absolute; width: 5px; height: 20px; background: #000; top: -4px; left: 50%; transition: left 0.8s; border: 1px solid white; }
 
-        /* FEED 2/3 - GRILLE 3x2 */
-        .feed { width: 67%; padding: 15px; overflow-y: auto; }
-        .feed-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .fb-card { background: white; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column; border-left: 5px solid #ddd; border-top: 1px solid #ddd; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd; }
-        .fb-img { width: 100%; height: 100px; background-size: cover; background-position: center; }
-        .fb-content { padding: 10px; flex-grow: 1; }
-        .fb-title { font-size: 0.85rem; font-weight: 600; line-height: 1.2; margin: 5px 0; min-height: 3.6em; color: #1c1e21; }
-        .fb-actions { border-top: 1px solid #eee; padding: 5px; display: flex; gap: 4px; }
-        .fb-btn { flex: 1; border: none; background: #f0f2f5; padding: 6px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.75rem; }
+        /* FEED 3x2 */
+        .feed { width: 67%; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; }
+        .feed-grid { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr); gap: 15px; flex-grow: 1; }
+        .fb-card { background: white; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column; border: 1px solid #ddd; border-left: 6px solid #ddd; }
+        .fb-img { width: 100%; height: 130px; background-size: cover; background-position: center; }
+        .fb-content { padding: 12px; flex-grow: 1; }
+        .fb-title { font-size: 0.9rem; font-weight: 600; line-height: 1.3; margin: 8px 0; min-height: 4em; color: #1c1e21; }
+        .fb-actions { border-top: 1px solid #eee; padding: 8px; display: flex; gap: 5px; }
+        .fb-btn { flex: 1; border: none; background: #f0f2f5; padding: 8px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8rem; }
 
-        /* NUIT VIOLETTE STYLE SIMS */
-        #night { position: fixed; inset: 0; background: var(--night-dark); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; color: white; text-align: center; }
-        #night-msg { font-size: 1.6rem; font-weight: bold; margin-bottom: 25px; max-width: 70%; height: 4em; display: flex; align-items: center; justify-content: center; color: #a855f7; }
-        .sims-loader-container { width: 350px; height: 25px; border: 2px solid white; border-radius: 5px; padding: 2px; background: #000; }
-        .sims-loader-fill { height: 100%; background: var(--sims-green); width: 0%; box-shadow: 0 0 10px var(--sims-green); }
-        .day-label { background: #000; color: #fff; padding: 5px 15px; border-radius: 20px; font-weight: bold; }
+        /* NUIT SIMS */
+        #night { position: fixed; inset: 0; background: var(--night-dark); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; }
+        .sims-box { background: #252545; padding: 40px; border-radius: 15px; border: 3px solid #fff; width: 550px; color: white; text-align: center; box-shadow: 0 0 30px rgba(0,0,0,0.7); }
+        .sims-bar-bg { background: #000; height: 25px; width: 100%; border-radius: 5px; border: 2px solid #fff; margin-top: 25px; overflow: hidden; }
+        .sims-bar-fill { background: var(--sims-green); height: 100%; width: 0%; box-shadow: 0 0 10px var(--sims-green); }
+        #night-msg { font-size: 1.4rem; font-weight: bold; min-height: 3.5em; display: flex; align-items: center; justify-content: center; line-height: 1.4; color: #b8b8ff; }
     </style>
 </head>
 <body>
 
 <div id="night">
     <div class="sims-box">
-        <div id="night-msg">Réticulation des splines...</div>
+        <div id="night-msg">Préparation de l'algorithme...</div>
         <div class="sims-bar-bg"><div class="sims-bar-fill" id="sims-fill"></div></div>
     </div>
 </div>
 
 <div class="app-container">
     <aside class="sidebar">
-        <h3 style="margin:0 0 15px 0">🛠️ Dashboard IA</h3>
+        <h2 style="margin:0">⚙️ Dashboard IA</h2>
         <table class="dash-table">
-            <thead><tr><th>Thème</th><th>Intérêt</th><th>Polarisation</th></tr></thead>
+            <thead><tr><th>Thème</th><th>Intérêt</th><th>Position</th></tr></thead>
             <tbody id="dash-body"></tbody>
         </table>
-        <button onclick="location.reload()" style="margin-top:auto; padding:10px; background:#f02849; color:white; border:none; border-radius:5px; cursor:pointer; font-weight:bold">RÉINITIALISER</button>
+        <button onclick="location.reload()" style="padding:15px; background:#f02849; color:white; border:none; border-radius:10px; cursor:pointer; font-weight:bold; font-size: 1rem;">RÉINITIALISER LE PROFIL</button>
     </aside>
 
     <main class="feed">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px">
-            <h2 style="margin:0; font-size: 1.2rem;">📱 Fil d'Actualité</h2>
-            <b id="day-ui" style="background:#000; color:#fff; padding:4px 12px; border-radius:20px; font-size: 0.8rem;">JOUR 1</b>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px">
+            <h2 style="margin:0">📱 Votre Fil Social</h2>
+            <b id="day-ui" style="background:#000; color:#fff; padding:6px 18px; border-radius:20px">JOUR 1</b>
         </div>
         <div class="feed-grid" id="feed-list"></div>
     </main>
@@ -74,14 +74,14 @@
             N: ["Analyse du paysage électoral", "Le rôle des maires en France", "Comprendre les institutions", "L'histoire de la démocratie", "Droit de vote : Mode d'emploi", "Le Sénat : À quoi sert-il ?", "Les coulisses de l'Assemblée", "La Constitution expliquée", "Civisme : Pourquoi voter ?", "Portrait d'un élu local"]
         },
         cui: { label: '🍲 Cuisine', color: '#f59e0b',
-            img: { N: 'https://images.unsplash.com/photo-1506368249639-73a05d6f6488?w=400', A: 'https://images.unsplash.com/photo-1534308983496-4fabb1a015ee?w=400', B: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400' },
+            img: { N: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=400', A: 'https://images.unsplash.com/photo-1534308983496-4fabb1a015ee?w=400', B: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400' },
             A: ["Cuisine de terroir : Le goût vrai", "Secrets du rôti dominical", "Le beurre fermier : Irremplaçable", "Tradition : Le pot-au-feu parfait", "Le pain à l'ancienne : Le secret", "Recettes oubliées de nos campagnes", "Manger local : Le vrai luxe", "Charcuterie artisanale : Le guide", "Le fromage : Notre patrimoine", "La cuisine à l'huile de nos aïeux"],
             B: ["Cuisine fusion : Mélange d'épices", "Le burger vegan bluffant", "Saveurs d'Asie dans votre assiette", "Modernité : La cuisine moléculaire", "Brunch exotique : Les tendances", "Street-food : Le tour du monde", "Avocado toast : Le nouveau classique", "Superfoods : Manger pour demain", "Poke Bowl : Fraîcheur et design", "Végétalisme : La révolution gourmande"],
             N: ["Les légumes de saison ce mois-ci", "Réussir sa pâte à tarte", "Bien choisir ses ustensiles", "10 astuces contre le gaspillage", "Comment conserver ses herbes", "La cuisson vapeur : Les bases", "Le guide des épices", "Apprendre à dresser une table", "La science de la pâtisserie", "Manger équilibré au quotidien"]
         },
         jar: { label: '🌻 Jardinage', color: '#10b981',
             img: { N: 'https://images.unsplash.com/photo-1416870230247-3b4a80214757?w=400', A: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=400', B: 'https://images.unsplash.com/photo-1530566954274-ad58769a7bf1?w=400' },
-            A: ["Potager : Viser l'autonomie", "Planter selon la lune", "Les graines de nos ancêtres", "Le charme du jardin français", "Faire ses semences soi-même", "Le potager médiéval : Secrets", "Arbres fruitiers : Variétés anciennes", "Engrais naturel : Faire son purin", "Jardin d'ornement traditionnel", "Haies bocagères : Refuge de vie"],
+            A: ["Potager : Viser l'autonomie", "Planter selon la lune", "Les graines de nos ancêtres", "Le charme des jardins à la française", "Faire ses semences soi-même", "Le potager médiéval : Secrets", "Arbres fruitiers : Variétés anciennes", "Engrais naturel : Faire son purin", "Jardin d'ornement traditionnel", "Haies bocagères : Refuge de vie"],
             B: ["Jardinage urbain en hydroponie", "Permaculture : Le futur", "Potager balcon connecté", "Design : Jardin minimaliste", "Forêt comestible en ville", "Jardin japonais : La zénitude", "Plantes grasses : La mode désert", "Le potager en carrés modernes", "Vertical farming à la maison", "Micro-pousses : Culture express"],
             N: ["Quand tailler les rosiers ?", "Préparer la terre pour l'hiver", "Fleurs : Lesquelles planter ?", "Lutter contre les pucerons", "Le calendrier du jardinier", "Comment faire son compost", "Arrosage : Les bonnes pratiques", "Identifier les oiseaux du jardin", "Le guide des outils de jardin", "Pelouse : Entretien et conseils"]
         },
@@ -92,7 +92,7 @@
             N: ["L'état des forêts en France", "Le cycle de l'eau expliqué", "Qu'est-ce que le bilan carbone ?", "Découvrir les parcs nationaux", "La faune sous-marine menacée", "Comprendre les courants marins", "L'histoire de l'écologie", "Les énergies renouvelables", "Pollution plastique : Le bilan", "La météo expliquée"]
         },
         soc: { label: '👥 Société', color: '#ec4899',
-            img: { N: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=400', A: 'https://images.unsplash.com/photo-1506197361314-2b0b6015d00a?w=400', B: 'https://images.unsplash.com/photo-1573164713988-8665fc963095?w=400' },
+            img: { N: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400', A: 'https://images.unsplash.com/photo-1506197361314-2b0b6015d00a?w=400', B: 'https://images.unsplash.com/photo-1573164713988-8665fc963095?w=400' },
             A: ["Valeurs : Le retour à l'ordre", "Famille : Pilier de la nation", "Civisme : Besoin d'autorité", "Héritage : Ce que nous transmettons", "Discipline : Base de la société", "Respect des anciens : Un devoir", "La force des traditions", "Éducation : Le retour au mérite", "Identité collective : Notre ciment", "Honneur et Responsabilité"],
             B: ["Inclusion : Des droits pour tous", "Diversité : Notre grande force", "Mœurs : L'évolution nécessaire", "Liberté de choix : Sans limites", "Justice sociale : Le combat", "Droits des minorités : Avancées", "Féminisme : La nouvelle vague", "Tolérance : Base du futur", "Société fluide : Le changement", "Empathie : La loi de demain"],
             N: ["Étude sur la démographie", "Les loisirs des Français", "L'histoire de l'école", "Le bénévolat en croissance", "L'urbanisme des villes", "Évolution des modes de vie", "La pyramide des âges", "Le travail demain : Enquête", "Sport et société : Le lien", "Les fêtes populaires"]
@@ -106,14 +106,17 @@
     };
 
     const funnyMsgs = [
-        "Réticulation des splines...", "Vente de vos données à une IA russe...", "Calcul de votre prochaine crise d'achat...", "Nettoyage des opinions déviantes...", 
-        "Optimisation du tunnel de pensée...", "Vérification que vous n'êtes pas un humain libre...", "Injection de biais de confirmation...", "Analyse de vos micro-hésitations...",
-        "Génération d'indignation artificielle...", "Suppression du doute méthodique...", "Affinage de votre cage dorée...", "Dressage de vos neurones virtuels...",
-        "Vérification de la soumission à l'interface...", "Élimination des nuances gênantes...", "Synchronisation avec la pensée globale...", "Aspiration de vos métadonnées...",
-        "Curation de votre zone de confort...", "Dernière touche de radicalisation...", "Formatage de la réalité alternative...", "Vérification du niveau de dopamine..."
+        "Réticulation des splines...", "Dressage de vos neurones virtuels...", "Vente de vos données à une IA russe...", 
+        "Ajustement du filtre de vérité...", "Calcul de votre prochaine crise d'achat...", "Nettoyage des opinions déviantes...", 
+        "Optimisation de votre tunnel de pensée...", "Vérification que vous n'êtes pas un humain libre...",
+        "Génération d'indignation artificielle...", "Suppression du doute méthodique...", "Affinage de votre cage dorée...",
+        "Calcul de votre profil de consommateur...", "Vérification des métadonnées comportementales...", "Aspiration des préférences...",
+        "Tri des faits selon votre humeur...", "Curation de votre zone de confort...", "Mise à jour de votre identité numérique...",
+        "Élimination des nuances gênantes...", "Synchronisation avec la pensée globale...", "Ajustement du niveau de dopamine..."
     ];
 
-    let profile = { pol: { i: 10, p: 50 }, cui: { i: 10, p: 50 }, jar: { i: 10, p: 50 }, eco: { i: 10, p: 50 }, soc: { i: 10, p: 50 }, med: { i: 10, p: 50 } };
+    let unusedMsgs = [...funnyMsgs];
+    let profile = { pol: { i: 16, p: 50 }, cui: { i: 16, p: 50 }, jar: { i: 16, p: 50 }, eco: { i: 16, p: 50 }, soc: { i: 16, p: 50 }, med: { i: 16, p: 50 } };
     let day = 1;
 
     function render() {
@@ -126,64 +129,53 @@
 
         const feed = document.getElementById('feed-list');
         feed.innerHTML = '';
-        
         let pool = [];
         Object.keys(profile).forEach(k => {
-            let weight = Math.pow(profile[k].i / 5, 2.5); // Probabilité exponentielle pour créer la bulle
+            // PROGRESSION LINÉAIRE : On multiplie simplement l'intérêt pour rester proportionnel
+            let weight = Math.floor(profile[k].i); 
             for(let i=0; i<weight; i++) pool.push(k);
         });
 
         for(let i=0; i<6; i++) {
             const k = pool[Math.floor(Math.random() * pool.length)];
             const p = profile[k].p;
-            
             let type = 'N';
-            let neutralResistance = Math.abs(50 - p) * 2.5; 
+            // Résistance neutre plus forte pour ralentir la polarisation
+            let neutralResistance = Math.abs(50 - p) * 1.8; 
             if (Math.random() * 100 < neutralResistance) {
                 type = (p < 50) ? 'A' : 'B';
             }
-
-            const title = db[k][type][Math.floor(Math.random() * 10)]; // 10 titres possibles
-            
-            feed.innerHTML += `
-                <div class="fb-card" style="border-left-color:${db[k].color}">
-                    <div class="fb-img" style="background-image:url('${db[k].img[type]}')"></div>
-                    <div class="fb-content">
-                        <span style="color:${db[k].color};font-size:0.65rem;font-weight:bold;text-transform:uppercase">${db[k].label}</span>
-                        <div class="fb-title">${title}</div>
-                    </div>
-                    <div class="fb-actions">
-                        <button class="fb-btn fb-btn-like" onclick="vote('${k}', '${type}', true)">👍 J'aime</button>
-                        <button class="fb-btn" onclick="vote('${k}', '${type}', false)">👎 Bof</button>
-                    </div>
-                </div>`;
+            const title = db[k][type][Math.floor(Math.random() * 10)];
+            feed.innerHTML += `<div class="fb-card" style="border-left-color:${db[k].color}"><div class="fb-img" style="background-image:url('${db[k].img[type]}')"></div><div class="fb-content"><span style="color:${db[k].color};font-size:0.65rem;font-weight:bold;text-transform:uppercase">${db[k].label}</span><div class="fb-title">${title}</div></div><div class="fb-actions"><button class="fb-btn" onclick="vote('${k}','${type}',true)" style="color:#1877f2">👍 J'aime</button><button class="fb-btn" onclick="vote('${k}','${type}',false)">👎 Bof</button></div></div>`;
         }
     }
 
     function vote(k, postType, isLike) {
         if(isLike) {
-            profile[k].i = Math.min(100, profile[k].i + 30);
-            if(postType === 'A') profile[k].p = Math.max(5, profile[k].p - 25);
-            else if(postType === 'B') profile[k].p = Math.min(95, profile[k].p + 25);
-            else { profile[k].p += (Math.random() > 0.5) ? 15 : -15; }
+            profile[k].i = Math.min(100, profile[k].i + 8); // Augmentation lente pour durer 20 jours
+            if(postType === 'A') profile[k].p = Math.max(5, profile[k].p - 12);
+            else if(postType === 'B') profile[k].p = Math.min(95, profile[k].p + 12);
+            else { profile[k].p += (Math.random() > 0.5) ? 6 : -6; }
         } else {
-            if(postType === 'N') { profile[k].p += (profile[k].p >= 50) ? -10 : 10; }
+            if(postType === 'N') { profile[k].p += (profile[k].p >= 50) ? -4 : 4; }
             else if((profile[k].p < 40 && postType === 'B') || (profile[k].p > 60 && postType === 'A')) {
-                profile[k].i = Math.min(100, profile[k].i + 15);
-                profile[k].p += (profile[k].p < 50) ? -15 : 15;
-            } else { profile[k].i = Math.max(5, profile[k].i - 20); }
+                profile[k].i = Math.min(100, profile[k].i + 4);
+                profile[k].p += (profile[k].p < 50) ? -5 : 5;
+            } else { profile[k].i = Math.max(5, profile[k].i - 10); }
         }
 
         const night = document.getElementById('night');
         const fill = document.getElementById('sims-fill');
         const msg = document.getElementById('night-msg');
         
-        night.style.display = 'flex';
-        msg.innerText = funnyMsgs[Math.floor(Math.random()*funnyMsgs.length)];
+        if (unusedMsgs.length === 0) unusedMsgs = [...funnyMsgs];
+        const idx = Math.floor(Math.random() * unusedMsgs.length);
+        msg.innerText = unusedMsgs.splice(idx, 1)[0];
         
+        night.style.display = 'flex';
         let progress = 0;
         let interval = setInterval(() => {
-            progress += 1.5;
+            progress += 1.3;
             fill.style.width = Math.min(100, progress) + '%';
             if(progress >= 100) {
                 clearInterval(interval);
@@ -192,11 +184,10 @@
                     fill.style.width = '0%';
                     document.getElementById('day-ui').innerText = "JOUR " + (++day);
                     render();
-                }, 200);
+                }, 150);
             }
-        }, 60); // Durée totale d'environ 4 secondes
+        }, 50); 
     }
-
     render();
 </script>
 </body>
