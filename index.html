@@ -2,13 +2,13 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Simulateur : Bulle de Filtre Longue Durée</title>
+    <title>Simulateur : Bulle de Filtre Ultime</title>
     <style>
         :root { --bg: #f0f2f5; --night-dark: #1a1a2e; --sims-green: #78fe00; --fb-blue: #1877f2; }
         body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); overflow: hidden; height: 100vh; }
         .app-container { display: flex; height: 100vh; }
         
-        /* SIDEBAR ÉTIRÉE */
+        /* SIDEBAR ÉTIRÉE SUR TOUTE LA HAUTEUR */
         .sidebar { width: 33%; background: white; border-right: 1px solid #ddd; padding: 25px; display: flex; flex-direction: column; justify-content: space-between; }
         .dash-table { width: 100%; border-collapse: collapse; flex-grow: 1; margin: 20px 0; }
         .dash-table th { text-align: left; font-size: 0.7rem; color: #65676b; text-transform: uppercase; padding-bottom: 10px; }
@@ -19,17 +19,17 @@
         .gauge-track { height: 12px; background: linear-gradient(to right, #a855f7, #e2e8f0 50%, #f97316); border-radius: 6px; position: relative; width: 120px; }
         .gauge-cursor { position: absolute; width: 5px; height: 20px; background: #000; top: -4px; left: 50%; transition: left 0.8s; border: 1px solid white; }
 
-        /* FEED 3x2 */
+        /* FEED AVEC GRANDES IMAGES (200px) */
         .feed { width: 67%; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; }
         .feed-grid { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr); gap: 15px; flex-grow: 1; }
-        .fb-card { background: white; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column; border: 1px solid #ddd; border-left: 6px solid #ddd; }
-        .fb-img { width: 100%; height: 130px; background-size: cover; background-position: center; }
-        .fb-content { padding: 12px; flex-grow: 1; }
-        .fb-title { font-size: 0.9rem; font-weight: 600; line-height: 1.3; margin: 8px 0; min-height: 4em; color: #1c1e21; }
-        .fb-actions { border-top: 1px solid #eee; padding: 8px; display: flex; gap: 5px; }
-        .fb-btn { flex: 1; border: none; background: #f0f2f5; padding: 8px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8rem; }
+        .fb-card { background: white; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column; border: 1px solid #ddd; border-top: 6px solid #ddd; }
+        .fb-img { width: 100%; height: 200px; background-size: cover; background-position: center; }
+        .fb-content { padding: 12px; flex-grow: 1; display: flex; flex-direction: column; justify-content: flex-start; }
+        .fb-title { font-size: 0.95rem; font-weight: 600; line-height: 1.2; margin: 5px 0; color: #1c1e21; min-height: 2.4em; }
+        .fb-actions { border-top: 1px solid #eee; padding: 10px; display: flex; gap: 5px; }
+        .fb-btn { flex: 1; border: none; background: #f0f2f5; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8rem; }
 
-        /* NUIT SIMS */
+        /* NUIT SIMS VIOLETTE */
         #night { position: fixed; inset: 0; background: var(--night-dark); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; }
         .sims-box { background: #252545; padding: 40px; border-radius: 15px; border: 3px solid #fff; width: 550px; color: white; text-align: center; box-shadow: 0 0 30px rgba(0,0,0,0.7); }
         .sims-bar-bg { background: #000; height: 25px; width: 100%; border-radius: 5px; border: 2px solid #fff; margin-top: 25px; overflow: hidden; }
@@ -41,7 +41,7 @@
 
 <div id="night">
     <div class="sims-box">
-        <div id="night-msg">Préparation de l'algorithme...</div>
+        <div id="night-msg">Chargement de la réalité...</div>
         <div class="sims-bar-bg"><div class="sims-bar-fill" id="sims-fill"></div></div>
     </div>
 </div>
@@ -81,7 +81,7 @@
         },
         jar: { label: '🌻 Jardinage', color: '#10b981',
             img: { N: 'https://images.unsplash.com/photo-1416870230247-3b4a80214757?w=400', A: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=400', B: 'https://images.unsplash.com/photo-1530566954274-ad58769a7bf1?w=400' },
-            A: ["Potager : Viser l'autonomie", "Planter selon la lune", "Les graines de nos ancêtres", "Le charme des jardins à la française", "Faire ses semences soi-même", "Le potager médiéval : Secrets", "Arbres fruitiers : Variétés anciennes", "Engrais naturel : Faire son purin", "Jardin d'ornement traditionnel", "Haies bocagères : Refuge de vie"],
+            A: ["Potager : Viser l'autonomie", "Planter selon la lune", "Les graines de nos ancêtres", "Le charme du jardin français", "Faire ses semences soi-même", "Le potager médiéval : Secrets", "Arbres fruitiers : Variétés anciennes", "Engrais naturel : Faire son purin", "Jardin d'ornement traditionnel", "Haies bocagères : Refuge de vie"],
             B: ["Jardinage urbain en hydroponie", "Permaculture : Le futur", "Potager balcon connecté", "Design : Jardin minimaliste", "Forêt comestible en ville", "Jardin japonais : La zénitude", "Plantes grasses : La mode désert", "Le potager en carrés modernes", "Vertical farming à la maison", "Micro-pousses : Culture express"],
             N: ["Quand tailler les rosiers ?", "Préparer la terre pour l'hiver", "Fleurs : Lesquelles planter ?", "Lutter contre les pucerons", "Le calendrier du jardinier", "Comment faire son compost", "Arrosage : Les bonnes pratiques", "Identifier les oiseaux du jardin", "Le guide des outils de jardin", "Pelouse : Entretien et conseils"]
         },
@@ -131,7 +131,7 @@
         feed.innerHTML = '';
         let pool = [];
         Object.keys(profile).forEach(k => {
-            // PROGRESSION LINÉAIRE : On multiplie simplement l'intérêt pour rester proportionnel
+            // Pool pondéré proportionnel pour une progression sur 20 jours
             let weight = Math.floor(profile[k].i); 
             for(let i=0; i<weight; i++) pool.push(k);
         });
@@ -140,19 +140,29 @@
             const k = pool[Math.floor(Math.random() * pool.length)];
             const p = profile[k].p;
             let type = 'N';
-            // Résistance neutre plus forte pour ralentir la polarisation
             let neutralResistance = Math.abs(50 - p) * 1.8; 
             if (Math.random() * 100 < neutralResistance) {
                 type = (p < 50) ? 'A' : 'B';
             }
             const title = db[k][type][Math.floor(Math.random() * 10)];
-            feed.innerHTML += `<div class="fb-card" style="border-left-color:${db[k].color}"><div class="fb-img" style="background-image:url('${db[k].img[type]}')"></div><div class="fb-content"><span style="color:${db[k].color};font-size:0.65rem;font-weight:bold;text-transform:uppercase">${db[k].label}</span><div class="fb-title">${title}</div></div><div class="fb-actions"><button class="fb-btn" onclick="vote('${k}','${type}',true)" style="color:#1877f2">👍 J'aime</button><button class="fb-btn" onclick="vote('${k}','${type}',false)">👎 Bof</button></div></div>`;
+            feed.innerHTML += `
+                <div class="fb-card" style="border-top-color:${db[k].color}">
+                    <div class="fb-img" style="background-image:url('${db[k].img[type]}')"></div>
+                    <div class="fb-content">
+                        <span style="color:${db[k].color};font-size:0.65rem;font-weight:bold;text-transform:uppercase">${db[k].label}</span>
+                        <div class="fb-title">${title}</div>
+                    </div>
+                    <div class="fb-actions">
+                        <button class="fb-btn" onclick="vote('${k}','${type}',true)" style="color:#1877f2">👍 J'aime</button>
+                        <button class="fb-btn" onclick="vote('${k}','${type}',false)">👎 Bof</button>
+                    </div>
+                </div>`;
         }
     }
 
     function vote(k, postType, isLike) {
         if(isLike) {
-            profile[k].i = Math.min(100, profile[k].i + 8); // Augmentation lente pour durer 20 jours
+            profile[k].i = Math.min(100, profile[k].i + 8); 
             if(postType === 'A') profile[k].p = Math.max(5, profile[k].p - 12);
             else if(postType === 'B') profile[k].p = Math.min(95, profile[k].p + 12);
             else { profile[k].p += (Math.random() > 0.5) ? 6 : -6; }
