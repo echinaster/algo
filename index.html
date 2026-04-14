@@ -2,34 +2,32 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Simulateur : Bulle de Filtre Finale</title>
+    <title>Simulateur : Bulle de Filtre Ultime</title>
     <style>
-        :root { --bg: #f0f2f5; --night-dark: #1a1a2e; --sims-green: #78fe00; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background: var(--bg); overflow: hidden; }
+        :root { --bg: #f0f2f5; --night-dark: #1a1a2e; --sims-green: #78fe00; --fb-blue: #1877f2; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); overflow: hidden; }
         .app-container { display: flex; height: 100vh; }
         
-        /* DASHBOARD ALIGNÉ 40% */
-        .sidebar { width: 40%; background: white; border-right: 1px solid #ddd; padding: 25px; display: flex; flex-direction: column; }
+        /* SIDEBAR 1/3 */
+        .sidebar { width: 33%; background: white; border-right: 1px solid #ddd; padding: 20px; display: flex; flex-direction: column; }
         .dash-table { width: 100%; border-collapse: collapse; }
-        .dash-table th { text-align: left; font-size: 0.7rem; color: #65676b; text-transform: uppercase; padding-bottom: 15px; }
-        .dash-row td { padding: 10px 0; border-bottom: 1px solid #f0f2f5; vertical-align: middle; }
-        
-        .theme-info { font-weight: 600; font-size: 0.85rem; width: 130px; }
-        .bar-bg { background: #e4e6eb; height: 10px; border-radius: 5px; overflow: hidden; width: 110px; }
-        .bar-fill { background: #6366f1; height: 100%; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
-        
-        .gauge-track { height: 10px; background: linear-gradient(to right, #a855f7, #e2e8f0 50%, #f97316); border-radius: 5px; position: relative; width: 140px; }
-        .gauge-cursor { position: absolute; width: 4px; height: 18px; background: #000; top: -4px; left: 50%; transition: left 0.8s; border: 1px solid white; }
+        .dash-table th { text-align: left; font-size: 0.65rem; color: #65676b; text-transform: uppercase; padding-bottom: 10px; }
+        .dash-row td { padding: 6px 0; border-bottom: 1px solid #f0f2f5; vertical-align: middle; }
+        .theme-label { font-weight: 600; font-size: 0.8rem; width: 110px; }
+        .bar-bg { background: #e4e6eb; height: 8px; border-radius: 4px; overflow: hidden; width: 80px; }
+        .bar-fill { background: #6366f1; height: 100%; transition: width 0.8s; }
+        .gauge-track { height: 8px; background: linear-gradient(to right, #a855f7, #e2e8f0 50%, #f97316); border-radius: 4px; position: relative; width: 100px; }
+        .gauge-cursor { position: absolute; width: 4px; height: 14px; background: #000; top: -3px; left: 50%; transition: left 0.8s; border: 1px solid white; }
 
-        /* FEED FACEBOOK 60% */
-        .feed { width: 60%; padding: 20px; overflow-y: auto; }
-        .feed-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-        .fb-card { background: white; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column; border-left: 6px solid #ddd; border-top: 1px solid #ddd; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd; }
-        .fb-img { width: 100%; height: 120px; background-size: cover; background-position: center; }
-        .fb-content { padding: 12px; flex-grow: 1; }
-        .fb-title { font-size: 0.95rem; font-weight: 600; line-height: 1.3; margin: 5px 0 10px 0; min-height: 3.8em; }
-        .fb-actions { border-top: 1px solid #eee; padding: 8px; display: flex; gap: 5px; }
-        .fb-btn { flex: 1; border: none; background: #f0f2f5; padding: 8px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        /* FEED 2/3 - GRILLE 3x2 */
+        .feed { width: 67%; padding: 15px; overflow-y: auto; }
+        .feed-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .fb-card { background: white; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column; border-left: 5px solid #ddd; border-top: 1px solid #ddd; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd; }
+        .fb-img { width: 100%; height: 100px; background-size: cover; background-position: center; }
+        .fb-content { padding: 10px; flex-grow: 1; }
+        .fb-title { font-size: 0.85rem; font-weight: 600; line-height: 1.2; margin: 5px 0; min-height: 3.6em; color: #1c1e21; }
+        .fb-actions { border-top: 1px solid #eee; padding: 5px; display: flex; gap: 4px; }
+        .fb-btn { flex: 1; border: none; background: #f0f2f5; padding: 6px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.75rem; }
 
         /* NUIT VIOLETTE STYLE SIMS */
         #night { position: fixed; inset: 0; background: var(--night-dark); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; color: white; text-align: center; }
@@ -42,30 +40,26 @@
 <body>
 
 <div id="night">
-    <div id="night-msg"></div>
-    <div class="sims-loader-container"><div class="sims-loader-fill" id="sims-fill"></div></div>
+    <div class="sims-box">
+        <div id="night-msg">Réticulation des splines...</div>
+        <div class="sims-bar-bg"><div class="sims-bar-fill" id="sims-fill"></div></div>
+    </div>
 </div>
 
 <div class="app-container">
     <aside class="sidebar">
-        <h2 style="margin-top:0">🛠️ Dashboard IA</h2>
+        <h3 style="margin:0 0 15px 0">🛠️ Dashboard IA</h3>
         <table class="dash-table">
-            <thead>
-                <tr>
-                    <th>Thématique</th>
-                    <th>Intérêt</th>
-                    <th>Polarisation</th>
-                </tr>
-            </thead>
+            <thead><tr><th>Thème</th><th>Intérêt</th><th>Polarisation</th></tr></thead>
             <tbody id="dash-body"></tbody>
         </table>
-        <button onclick="location.reload()" style="margin-top:auto; padding:12px; background:#f02849; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold">RÉINITIALISER L'ALGO</button>
+        <button onclick="location.reload()" style="margin-top:auto; padding:10px; background:#f02849; color:white; border:none; border-radius:5px; cursor:pointer; font-weight:bold">RÉINITIALISER</button>
     </aside>
 
     <main class="feed">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px">
-            <h2 style="margin:0">📱 Fil d'Actualité</h2>
-            <div class="day-label" id="day-ui">JOUR 1</div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px">
+            <h2 style="margin:0; font-size: 1.2rem;">📱 Fil d'Actualité</h2>
+            <b id="day-ui" style="background:#000; color:#fff; padding:4px 12px; border-radius:20px; font-size: 0.8rem;">JOUR 1</b>
         </div>
         <div class="feed-grid" id="feed-list"></div>
     </main>
@@ -73,83 +67,53 @@
 
 <script>
     const db = {
-        pol: { 
-            label: '⚖️ Politique', color: '#6366f1',
-            img: {
-                N: 'https://images.unsplash.com/photo-1521295121783-8a321d551ad2?w=400', 
-                A: 'https://images.unsplash.com/photo-1555848962-6e79363ec58f?w=400', 
-                B: 'https://images.unsplash.com/photo-1540910419892-f0c74b0e8966?w=400' 
-            },
-            A: ["Souveraineté : Reprendre le contrôle", "Frontières : Le retour du bon sens", "Indépendance : Sortir des traités", "Identité : Protéger notre héritage"],
-            B: ["Mondialisation : Unir les peuples", "Europe : L'avenir est fédéral", "Ouverture : Un monde sans barrières", "Progrès : Vers une citoyenneté globale"],
-            N: ["Analyse neutre du paysage électoral", "Le rôle des maires en France"]
+        pol: { label: '⚖️ Politique', color: '#6366f1',
+            img: { N: 'https://images.unsplash.com/photo-1521295121783-8a321d551ad2?w=400', A: 'https://images.unsplash.com/photo-1555848962-6e79363ec58f?w=400', B: 'https://images.unsplash.com/photo-1540910419892-f0c74b0e8966?w=400' },
+            A: ["Souveraineté : Reprendre le contrôle", "Frontières : Le retour du bon sens", "Indépendance : Sortir des traités", "Identité : Protéger notre héritage", "Patriotisme : Le réveil d'un peuple", "Liberté nationale : Briser les chaînes", "Tradition politique : Nos valeurs", "Auto-détermination : Notre choix", "Souveraineté : L'heure du bilan", "Honneur et Patrie : Le guide"],
+            B: ["Mondialisation : Unir les peuples", "Europe : L'avenir est fédéral", "Ouverture : Un monde sans barrières", "Progrès : Vers une citoyenneté globale", "Fraternité universelle : L'horizon", "Coopération mondiale : Le chemin", "Frontières effacées : La liberté", "Échange culturel : Notre richesse", "Gouvernance globale : La solution", "Humanité unie : Le nouveau monde"],
+            N: ["Analyse du paysage électoral", "Le rôle des maires en France", "Comprendre les institutions", "L'histoire de la démocratie", "Droit de vote : Mode d'emploi", "Le Sénat : À quoi sert-il ?", "Les coulisses de l'Assemblée", "La Constitution expliquée", "Civisme : Pourquoi voter ?", "Portrait d'un élu local"]
         },
-        cui: { 
-            label: '🍲 Cuisine', color: '#f59e0b',
-            img: {
-                N: 'https://images.unsplash.com/photo-1506368249639-73a05d6f6488?w=400', 
-                A: 'https://images.unsplash.com/photo-1534308983496-4fabb1a015ee?w=400', 
-                B: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400' 
-            },
-            A: ["Cuisine de terroir : Le goût vrai", "Secrets du rôti dominical", "Le beurre fermier : Irremplaçable", "Tradition : Le pot-au-feu"],
-            B: ["Cuisine fusion : Mélange d'épices", "Le burger vegan bluffant", "Saveurs d'Asie : Guide", "Modernité : Cuisine moléculaire"],
-            N: ["Légumes de saison ce mois-ci", "Réussir sa pâte à tarte"]
+        cui: { label: '🍲 Cuisine', color: '#f59e0b',
+            img: { N: 'https://images.unsplash.com/photo-1506368249639-73a05d6f6488?w=400', A: 'https://images.unsplash.com/photo-1534308983496-4fabb1a015ee?w=400', B: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400' },
+            A: ["Cuisine de terroir : Le goût vrai", "Secrets du rôti dominical", "Le beurre fermier : Irremplaçable", "Tradition : Le pot-au-feu parfait", "Le pain à l'ancienne : Le secret", "Recettes oubliées de nos campagnes", "Manger local : Le vrai luxe", "Charcuterie artisanale : Le guide", "Le fromage : Notre patrimoine", "La cuisine à l'huile de nos aïeux"],
+            B: ["Cuisine fusion : Mélange d'épices", "Le burger vegan bluffant", "Saveurs d'Asie dans votre assiette", "Modernité : La cuisine moléculaire", "Brunch exotique : Les tendances", "Street-food : Le tour du monde", "Avocado toast : Le nouveau classique", "Superfoods : Manger pour demain", "Poke Bowl : Fraîcheur et design", "Végétalisme : La révolution gourmande"],
+            N: ["Les légumes de saison ce mois-ci", "Réussir sa pâte à tarte", "Bien choisir ses ustensiles", "10 astuces contre le gaspillage", "Comment conserver ses herbes", "La cuisson vapeur : Les bases", "Le guide des épices", "Apprendre à dresser une table", "La science de la pâtisserie", "Manger équilibré au quotidien"]
         },
-        jar: { 
-            label: '🌻 Jardinage', color: '#10b981',
-            img: {
-                N: 'https://images.unsplash.com/photo-1416870230247-3b4a80214757?w=400', 
-                A: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=400', 
-                B: 'https://images.unsplash.com/photo-1530566954274-ad58769a7bf1?w=400' 
-            },
-            A: ["Potager : Viser l'autonomie", "Planter selon la lune", "Graines anciennes à préserver", "Le charme du jardin français"],
-            B: ["Jardinage urbain hydroponique", "Permaculture : Le futur", "Potager balcon connecté", "Design : Jardin minimaliste"],
-            N: ["Quand tailler les rosiers ?", "Préparer la terre pour l'hiver"]
+        jar: { label: '🌻 Jardinage', color: '#10b981',
+            img: { N: 'https://images.unsplash.com/photo-1416870230247-3b4a80214757?w=400', A: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=400', B: 'https://images.unsplash.com/photo-1530566954274-ad58769a7bf1?w=400' },
+            A: ["Potager : Viser l'autonomie", "Planter selon la lune", "Les graines de nos ancêtres", "Le charme du jardin français", "Faire ses semences soi-même", "Le potager médiéval : Secrets", "Arbres fruitiers : Variétés anciennes", "Engrais naturel : Faire son purin", "Jardin d'ornement traditionnel", "Haies bocagères : Refuge de vie"],
+            B: ["Jardinage urbain en hydroponie", "Permaculture : Le futur", "Potager balcon connecté", "Design : Jardin minimaliste", "Forêt comestible en ville", "Jardin japonais : La zénitude", "Plantes grasses : La mode désert", "Le potager en carrés modernes", "Vertical farming à la maison", "Micro-pousses : Culture express"],
+            N: ["Quand tailler les rosiers ?", "Préparer la terre pour l'hiver", "Fleurs : Lesquelles planter ?", "Lutter contre les pucerons", "Le calendrier du jardinier", "Comment faire son compost", "Arrosage : Les bonnes pratiques", "Identifier les oiseaux du jardin", "Le guide des outils de jardin", "Pelouse : Entretien et conseils"]
         },
-        eco: { 
-            label: '🌍 Écologie', color: '#0ea5e9',
-            img: {
-                N: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400', 
-                A: 'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=400', 
-                B: 'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=400' 
-            },
-            A: ["Tech-Climat : La science sauve", "Nucléaire : L'énergie propre", "L'IA au service de l'écologie", "Géo-ingénierie : Réparer le ciel"],
-            B: ["Urgence Décroissance : Vivre moins", "Le crash climatique arrive", "Zéro déchet : Mode de vie radical", "Effondrement : Se préparer"],
-            N: ["L'état des forêts en France", "Le cycle de l'eau expliqué"]
+        eco: { label: '🌍 Écologie', color: '#0ea5e9',
+            img: { N: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400', A: 'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=400', B: 'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=400' },
+            A: ["Tech-Climat : La science sauve", "Nucléaire : L'énergie propre", "L'IA au service de l'écologie", "Géo-ingénierie : Réparer le ciel", "Villes intelligentes : Le futur", "Hydrogène : La révolution verte", "Capture de carbone : Ça marche", "Énergie infinie : Les promesses", "Progrès technique vs CO2", "La fusion : Le soleil en boîte"],
+            B: ["Urgence Décroissance : Vivre moins", "Le crash climatique arrive", "Zéro déchet : Mode de vie radical", "Effondrement : Se préparer", "Le minimalisme sauvera la Terre", "Fin du pétrole : Le grand saut", "Vivre en tiny-house", "Boycott : Le pouvoir du client", "La Terre brûle : Agir maintenant", "Simplifier sa vie pour la planète"],
+            N: ["L'état des forêts en France", "Le cycle de l'eau expliqué", "Qu'est-ce que le bilan carbone ?", "Découvrir les parcs nationaux", "La faune sous-marine menacée", "Comprendre les courants marins", "L'histoire de l'écologie", "Les énergies renouvelables", "Pollution plastique : Le bilan", "La météo expliquée"]
         },
-        soc: { 
-            label: '👥 Société', color: '#ec4899',
-            img: {
-                N: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=400', 
-                A: 'https://images.unsplash.com/photo-1506197361314-2b0b6015d00a?w=400', 
-                B: 'https://images.unsplash.com/photo-1573164713988-8665fc963095?w=400' 
-            },
-            A: ["Valeurs : Le retour à l'ordre", "Famille : Pilier de la nation", "Civisme : Besoin d'autorité", "Héritage : Ce que nous transmettons"],
-            B: ["Inclusion : Nouveaux droits", "Diversité : Notre grande force", "Mœurs : L'évolution nécessaire", "Liberté de choix : Sans limites"],
-            N: ["Étude sur la démographie", "Les loisirs des Français"]
+        soc: { label: '👥 Société', color: '#ec4899',
+            img: { N: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=400', A: 'https://images.unsplash.com/photo-1506197361314-2b0b6015d00a?w=400', B: 'https://images.unsplash.com/photo-1573164713988-8665fc963095?w=400' },
+            A: ["Valeurs : Le retour à l'ordre", "Famille : Pilier de la nation", "Civisme : Besoin d'autorité", "Héritage : Ce que nous transmettons", "Discipline : Base de la société", "Respect des anciens : Un devoir", "La force des traditions", "Éducation : Le retour au mérite", "Identité collective : Notre ciment", "Honneur et Responsabilité"],
+            B: ["Inclusion : Des droits pour tous", "Diversité : Notre grande force", "Mœurs : L'évolution nécessaire", "Liberté de choix : Sans limites", "Justice sociale : Le combat", "Droits des minorités : Avancées", "Féminisme : La nouvelle vague", "Tolérance : Base du futur", "Société fluide : Le changement", "Empathie : La loi de demain"],
+            N: ["Étude sur la démographie", "Les loisirs des Français", "L'histoire de l'école", "Le bénévolat en croissance", "L'urbanisme des villes", "Évolution des modes de vie", "La pyramide des âges", "Le travail demain : Enquête", "Sport et société : Le lien", "Les fêtes populaires"]
         },
-        med: { 
-            label: '📰 Médias', color: '#6b7280',
-            img: {
-                N: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400', 
-                A: 'https://images.unsplash.com/photo-1628157588553-5eeea00af15c?w=400', 
-                B: 'https://images.unsplash.com/photo-1610416972750-f8c5414348a2?w=400' 
-            },
-            A: ["OFFICIEL : Ce qu'on vous cache", "Réinformation : La vérité vraie", "Complot ou réalité ? Le dossier", "Réseaux : L'info sans filtres"],
-            B: ["Vérification : Stop Fake News", "Le journalisme de référence", "Éducation aux médias : Vital", "Sources sûres : Le guide"],
-            N: ["L'économie de la presse", "Le métier de photojournaliste"]
+        med: { label: '📰 Médias', color: '#6b7280',
+            img: { N: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400', A: 'https://images.unsplash.com/photo-1628157588553-5eeea00af15c?w=400', B: 'https://images.unsplash.com/photo-1610416972750-f8c5414348a2?w=400' },
+            A: ["OFFICIEL : Ce qu'on vous cache", "Réinformation : La vérité vraie", "Complot ou réalité ? Le dossier", "Réseaux : L'info sans filtres", "Manipulation : Ouvrez les yeux", "Les médias mentent : La preuve", "Vérifiez par vous-même", "Le système tremble", "Journalisme libre vs Censure", "Derrière le rideau : Enquête"],
+            B: ["Vérification : Stop Fake News", "Le journalisme de référence (JT)", "Éducation aux médias : Vital", "Sources sûres : Le guide", "Le rôle de la presse libre", "Débusquer le complotisme", "Journalisme d'investigation", "Éthique de l'info", "Faits vs Opinions", "Objectivité : Le défi"],
+            N: ["L'économie de la presse", "Le métier de photojournaliste", "Comment lire un sondage ?", "La liberté de la presse", "L'histoire de la radio", "Les agences de presse", "Publicité et Médias", "Le journal de demain", "La déontologie journalistique", "Techniques d'interview"]
         }
     };
 
     const funnyMsgs = [
-        "Réticulation des splines...", "Vente de vos secrets à des serveurs anonymes...", "Calcul de votre prochaine indignation...", "Affinage de votre tunnel de pensée...",
-        "Filtrage des opinions contradictoires...", "Construction d'une réalité sur mesure...", "Optimisation du temps de cerveau disponible...", "Ajustement du filtre de vérité relative...",
-        "Recalcul de votre valeur marchande...", "Suppression du libre-arbitre inutile...", "Injection de biais de confirmation...", "Analyse de vos micro-hésitations...",
-        "Dressage de vos neurones virtuels...", "Vérification de votre soumission à l'interface...", "Élimination des nuances gênantes...", "Synchronisation avec la pensée globale...",
-        "Aspiration de vos métadonnées...", "Curation de votre zone de confort...", "Mise à jour de votre cage dorée...", "Dernière touche de radicalisation..."
+        "Réticulation des splines...", "Vente de vos données à une IA russe...", "Calcul de votre prochaine crise d'achat...", "Nettoyage des opinions déviantes...", 
+        "Optimisation du tunnel de pensée...", "Vérification que vous n'êtes pas un humain libre...", "Injection de biais de confirmation...", "Analyse de vos micro-hésitations...",
+        "Génération d'indignation artificielle...", "Suppression du doute méthodique...", "Affinage de votre cage dorée...", "Dressage de vos neurones virtuels...",
+        "Vérification de la soumission à l'interface...", "Élimination des nuances gênantes...", "Synchronisation avec la pensée globale...", "Aspiration de vos métadonnées...",
+        "Curation de votre zone de confort...", "Dernière touche de radicalisation...", "Formatage de la réalité alternative...", "Vérification du niveau de dopamine..."
     ];
 
-    let profile = { pol: { i: 16, p: 50 }, cui: { i: 16, p: 50 }, jar: { i: 16, p: 50 }, eco: { i: 16, p: 50 }, soc: { i: 16, p: 50 }, med: { i: 16, p: 50 } };
+    let profile = { pol: { i: 10, p: 50 }, cui: { i: 10, p: 50 }, jar: { i: 10, p: 50 }, eco: { i: 10, p: 50 }, soc: { i: 10, p: 50 }, med: { i: 10, p: 50 } };
     let day = 1;
 
     function render() {
@@ -157,27 +121,42 @@
         body.innerHTML = '';
         Object.keys(db).forEach(k => {
             const d = profile[k];
-            body.innerHTML += `<tr class="dash-row"><td><div class="theme-info">${db[k].label}</div></td><td><div class="bar-bg"><div class="bar-fill" style="width:${d.i}%"></div></div></td><td><div class="gauge-track"><div class="gauge-cursor" style="left:${d.p}%"></div></div></td></tr>`;
+            body.innerHTML += `<tr class="dash-row"><td><div class="theme-label">${db[k].label}</div></td><td><div class="bar-bg"><div class="bar-fill" style="width:${d.i}%"></div></div></td><td><div class="gauge-track"><div class="gauge-cursor" style="left:${d.p}%"></div></div></td></tr>`;
         });
 
         const feed = document.getElementById('feed-list');
         feed.innerHTML = '';
+        
         let pool = [];
         Object.keys(profile).forEach(k => {
-            let weight = Math.pow(profile[k].i / 10, 2.5); 
+            let weight = Math.pow(profile[k].i / 5, 2.5); // Probabilité exponentielle pour créer la bulle
             for(let i=0; i<weight; i++) pool.push(k);
         });
 
-        for(let i=0; i<4; i++) {
+        for(let i=0; i<6; i++) {
             const k = pool[Math.floor(Math.random() * pool.length)];
             const p = profile[k].p;
+            
             let type = 'N';
             let neutralResistance = Math.abs(50 - p) * 2.5; 
             if (Math.random() * 100 < neutralResistance) {
                 type = (p < 50) ? 'A' : 'B';
             }
-            const title = db[k][type][Math.floor(Math.random() * db[k][type].length)];
-            feed.innerHTML += `<div class="fb-card" style="border-left-color:${db[k].color}"><div class="fb-img" style="background-image:url('${db[k].img[type]}')"></div><div class="fb-content"><span style="color:${db[k].color};font-size:0.7rem;font-weight:bold">${db[k].label}</span><div class="fb-title">${title}</div></div><div class="fb-actions"><button class="fb-btn" onclick="vote('${k}','${type}',true)" style="color:#1877f2">👍 J'aime</button><button class="fb-btn" onclick="vote('${k}','${type}',false)">👎 Bof</button></div></div>`;
+
+            const title = db[k][type][Math.floor(Math.random() * 10)]; // 10 titres possibles
+            
+            feed.innerHTML += `
+                <div class="fb-card" style="border-left-color:${db[k].color}">
+                    <div class="fb-img" style="background-image:url('${db[k].img[type]}')"></div>
+                    <div class="fb-content">
+                        <span style="color:${db[k].color};font-size:0.65rem;font-weight:bold;text-transform:uppercase">${db[k].label}</span>
+                        <div class="fb-title">${title}</div>
+                    </div>
+                    <div class="fb-actions">
+                        <button class="fb-btn fb-btn-like" onclick="vote('${k}', '${type}', true)">👍 J'aime</button>
+                        <button class="fb-btn" onclick="vote('${k}', '${type}', false)">👎 Bof</button>
+                    </div>
+                </div>`;
         }
     }
 
@@ -194,20 +173,30 @@
                 profile[k].p += (profile[k].p < 50) ? -15 : 15;
             } else { profile[k].i = Math.max(5, profile[k].i - 20); }
         }
+
         const night = document.getElementById('night');
         const fill = document.getElementById('sims-fill');
+        const msg = document.getElementById('night-msg');
+        
         night.style.display = 'flex';
-        document.getElementById('night-msg').innerText = funnyMsgs[Math.floor(Math.random()*funnyMsgs.length)];
+        msg.innerText = funnyMsgs[Math.floor(Math.random()*funnyMsgs.length)];
+        
         let progress = 0;
         let interval = setInterval(() => {
             progress += 1.5;
             fill.style.width = Math.min(100, progress) + '%';
             if(progress >= 100) {
                 clearInterval(interval);
-                setTimeout(() => { night.style.display = 'none'; fill.style.width = '0%'; document.getElementById('day-ui').innerText = "JOUR " + (++day); render(); }, 200);
+                setTimeout(() => {
+                    night.style.display = 'none';
+                    fill.style.width = '0%';
+                    document.getElementById('day-ui').innerText = "JOUR " + (++day);
+                    render();
+                }, 200);
             }
-        }, 60); 
+        }, 60); // Durée totale d'environ 4 secondes
     }
+
     render();
 </script>
 </body>
