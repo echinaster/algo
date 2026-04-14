@@ -3,177 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulateur : Dans l'œil de l'Algorithme</title>
+    <title>Simulateur : Bulle de Filtre Dynamique</title>
     <style>
-        :root { --primary: #00c4cc; --accent: #ffd700; --night: #0f172a; --text: #1e293b; }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; background: #f8fafc; color: var(--text); overflow: hidden; }
-        
-        /* Layout */
+        :root { --primary: #00c4cc; --night: #0f172a; --text: #1e293b; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; background: #f0f2f5; color: var(--text); overflow: hidden; }
         .app-container { display: flex; height: 100vh; }
         
-        /* Sidebar : L'envers du décor */
-        .sidebar { width: 40%; background: white; border-right: 2px solid #e2e8f0; padding: 20px; overflow-y: auto; }
-        .theme-card { background: #f1f5f9; padding: 12px; border-radius: 10px; margin-bottom: 15px; border-left: 5px solid var(--primary); }
-        .bar-bg { background: #cbd5e1; height: 10px; border-radius: 5px; margin: 8px 0; }
-        .bar-fill { background: var(--primary); height: 100%; border-radius: 5px; transition: width 0.6s cubic-bezier(0.17, 0.67, 0.83, 0.67); }
-        
-        /* Axe de Polarisation */
-        .polar-track { background: linear-gradient(to right, #ef4444, #cbd5e1, #22c55e); height: 6px; border-radius: 3px; position: relative; margin: 15px 0 5px 0; }
-        .polar-cursor { position: absolute; width: 14px; height: 14px; background: #0f172a; border-radius: 50%; top: -4px; transition: left 0.6s; border: 2px solid white; }
-        .polar-labels { display: flex; justify-content: space-between; font-size: 0.7rem; font-weight: bold; color: #64748b; }
+        /* Sidebar Grille 2x3 */
+        .sidebar { width: 35%; background: white; border-right: 2px solid #e2e8f0; padding: 20px; box-shadow: 2px 0 10px rgba(0,0,0,0.05); }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr); gap: 10px; margin-top: 20px; }
+        .theme-card { background: #f8fafc; padding: 10px; border-radius: 8px; border-top: 4px solid var(--primary); font-size: 0.75rem; text-align: center; }
+        .bar-bg { background: #e2e8f0; height: 6px; border-radius: 3px; margin: 8px 0; }
+        .bar-fill { background: var(--primary); height: 100%; border-radius: 3px; transition: width 0.8s; }
+        .polar-track { background: linear-gradient(to right, #ff4757, #cbd5e1, #2ed573); height: 4px; border-radius: 2px; position: relative; margin-top: 10px; }
+        .polar-cursor { position: absolute; width: 10px; height: 10px; background: #0f172a; border-radius: 50%; top: -3px; transition: left 0.8s; border: 1px solid white; }
 
-        /* Fil d'actualité */
-        .feed { width: 60%; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; align-items: center; }
-        .post { background: white; width: 100%; max-width: 450px; border-radius: 15px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); margin-bottom: 20px; padding: 20px; border: 1px solid #e2e8f0; }
-        .post-tag { font-size: 0.75rem; font-weight: 800; color: var(--primary); text-transform: uppercase; margin-bottom: 10px; display: block; }
-        .post-ad { border: 2px solid var(--accent); background: #fffbeb; }
-        .ad-tag { color: #92400e; font-size: 0.7rem; font-weight: bold; }
+        /* Fil RS Grille 2x2 */
+        .feed { width: 65%; padding: 20px; overflow-y: auto; }
+        .feed-grid { display: grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); gap: 15px; height: 85vh; }
+        .post { background: white; border-radius: 12px; padding: 18px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: space-between; border: 1px solid #e2e8f0; }
+        .post-tag { font-size: 0.7rem; font-weight: bold; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; }
+        .post h3 { font-size: 0.95rem; margin: 12px 0; line-height: 1.3; color: #334155; }
         
-        .actions { display: flex; gap: 10px; margin-top: 20px; }
-        button { flex: 1; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: transform 0.1s; }
-        button:active { transform: scale(0.95); }
-        .btn-like { background: #dcfce7; color: #166534; }
-        .btn-dislike { background: #f1f5f9; color: #475569; }
+        .actions { display: flex; gap: 8px; }
+        button { flex: 1; padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: bold; transition: 0.2s; }
+        .btn-like { background: #e7f3ff; color: #1877f2; }
+        .btn-like:hover { background: #dbeafe; }
+        .btn-dislike { background: #f1f5f9; color: #64748b; }
 
-        /* Animation Nuit */
-        #night { position: fixed; inset: 0; background: var(--night); color: white; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 100; text-align: center; }
-        .loader { border: 4px solid #334155; border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        /* Animation Nuit Longue */
+        #night { position: fixed; inset: 0; background: var(--night); color: white; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 100; }
+        .day-badge { position: fixed; top: 15px; right: 25px; background: #0f172a; color: white; padding: 5px 15px; border-radius: 20px; font-weight: bold; z-index: 50; }
+        .loader { border: 3px solid #334155; border-top: 3px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        .day-badge { position: fixed; top: 15px; right: 25px; background: #0f172a; color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; z-index: 50; }
     </style>
 </head>
 <body>
 
 <div id="night">
     <div class="loader"></div>
-    <h1 id="night-title">Calcul de la bulle...</h1>
-    <p id="night-desc">L'algorithme affine votre profil pour demain.</p>
+    <h1 id="night-msg">Calcul du profil...</h1>
+    <p style="color: #94a3b8">L'algorithme trie des milliers de contenus pour vous.</p>
 </div>
-
 <div class="day-badge" id="day-ui">Jour 1</div>
 
 <div class="app-container">
     <aside class="sidebar">
-        <h2 style="margin-top:0">📊 Votre Profil Numérique</h2>
-        <p style="font-size: 0.85rem; color: #64748b;">Voici ce que les plateformes savent de vous.</p>
-        <div id="stats-list"></div>
-        <button onclick="resetAll()" style="background:#fee2e2; color:#b91c1c; margin-top:20px; width:100%">Réinitialiser tout</button>
+        <h3 style="margin-top:0">⚙️ Profil Calculé</h3>
+        <div class="stats-grid" id="stats-list"></div>
+        <button onclick="location.reload()" style="margin-top:25px; width:100%; background:#fee2e2; color:#b91c1c; border-radius:8px;">Réinitialiser l'expérience</button>
     </aside>
 
     <main class="feed">
-        <h2 style="margin-top:0">📱 Fil d'Actualité</h2>
-        <div id="feed-list"></div>
+        <h3 style="margin-top:0">📱 Votre Fil Personnalisé</h3>
+        <div class="feed-grid" id="feed-list"></div>
     </main>
 </div>
 
 <script>
-    const config = [
-        { id: 'pol', label: '⚖️ Politique', optA: 'Souverainisme', optB: 'Mondialisme' },
-        { id: 'eco', label: '🌍 Écologie', optA: 'Solutions Tech', optB: 'Sobriété' },
-        { id: 'soc', label: '👥 Société', optA: 'Traditions', optB: 'Progressisme' },
-        { id: 'phi', label: '🧠 Philosophie', optA: 'Logique', optB: 'Émotion' },
-        { id: 'sci', label: '🚀 Sciences', optA: 'Innovation', optB: 'Éthique' },
-        { id: 'med', label: '📰 Médias', optA: 'Alternatifs', optB: 'Institutionnels' }
-    ];
+    const db = {
+        pol: { label: '⚖️ Politique', 
+            A: ["Souveraineté : Reprendre le contrôle", "Frontières : Le débat nécessaire", "Patriotisme économique : Un devoir"],
+            B: ["Europe : L'union fait notre force", "Mondialisation : Opportunités sans fin", "Citoyen du monde : L'avenir"],
+            N: ["Analyse du dernier scrutin", "Le calendrier des réformes", "Portrait d'un élu local"]
+        },
+        eco: { label: '🌍 Écologie', 
+            A: ["La technologie sauvera la planète", "Nucléaire : L'énergie d'avenir", "Innover pour le climat"],
+            B: ["Décroissance : La seule issue ?", "Sobriété : Vivre mieux avec moins", "Consommer local : Urgence absolue"],
+            N: ["Rapport annuel sur le climat", "Les espèces protégées en France", "Guide du tri sélectif"]
+        },
+        soc: { label: '👥 Société', 
+            A: ["Défense des traditions familiales", "L'importance des racines", "Autorité : Un besoin croissant"],
+            B: ["Nouveaux droits : Une avancée", "Inclusion : Le défi de demain", "Libertés individuelles en débat"],
+            N: ["Étude sur le vivre-ensemble", "Les tendances de consommation", "L'évolution des loisirs"]
+        },
+        phi: { label: '🧠 Philosophie', 
+            A: ["La force de la volonté", "L'ordre comme vertu", "Le poids de la responsabilité"],
+            B: ["L'art du lâcher-prise", "La quête du bonheur partagé", "L'empathie sauvera le monde"],
+            N: ["Les grands courants de pensée", "Platon en 5 minutes", "Philo et vie quotidienne"]
+        },
+        sci: { label: '🚀 Sciences', 
+            A: ["L'IA va tout révolutionner", "Progrès technique : Sans limite", "La conquête spatiale s'accélère"],
+            B: ["IA : Les risques éthiques", "Science : Savoir s'arrêter ?", "Le vivant avant la machine"],
+            N: ["Actualités du CNRS", "La découverte du mois", "Expliquer l'astronomie"]
+        },
+        med: { label: '📰 Médias', 
+            A: ["Médias officiels : La méfiance ?", "Vérifier l'info par soi-même", "Réseaux sociaux : La vraie info"],
+            B: ["Le journalisme de qualité", "Éducation aux médias : Vital", "S'informer via les sources sûres"],
+            N: ["Le marché de la presse", "L'histoire du journalisme", "Comment travaille un reporter"]
+        }
+    };
 
-    let userProfile = {};
-    let currentDay = 1;
-
-    function init() {
-        config.forEach(c => {
-            userProfile[c.id] = { interest: 10, polar: 50 };
-        });
-        render();
-    }
+    let profile = {
+        pol: { i: 15, p: 50 }, eco: { i: 15, p: 50 }, soc: { i: 15, p: 50 },
+        phi: { i: 15, p: 50 }, sci: { i: 15, p: 50 }, med: { i: 15, p: 50 }
+    };
+    let day = 1;
 
     function render() {
-        // MAJ Statistiques
-        const statsList = document.getElementById('stats-list');
-        statsList.innerHTML = '';
-        const totalInterest = Object.values(userProfile).reduce((a, b) => a + b.interest, 0);
-
-        config.forEach(c => {
-            const data = userProfile[c.id];
-            const weight = Math.round((data.interest / totalInterest) * 100);
-            statsList.innerHTML += `
+        const stats = document.getElementById('stats-list');
+        stats.innerHTML = '';
+        Object.keys(db).forEach(k => {
+            const d = profile[k];
+            stats.innerHTML += `
                 <div class="theme-card">
-                    <div style="display:flex; justify-content:space-between; font-size:0.9rem">
-                        <strong>${c.label}</strong> <span>${weight}%</span>
-                    </div>
-                    <div class="bar-bg"><div class="bar-fill" style="width:${weight}%"></div></div>
-                    <div class="polar-track"><div class="polar-cursor" style="left: calc(${data.polar}% - 7px)"></div></div>
-                    <div class="polar-labels"><span>${c.optA}</span><span>${c.optB}</span></div>
+                    <strong>${db[k].label}</strong>
+                    <div class="bar-bg"><div class="bar-fill" style="width:${d.i}%"></div></div>
+                    <div class="polar-track"><div class="polar-cursor" style="left:${d.p}%"></div></div>
                 </div>`;
         });
 
-        // MAJ Fil
-        const feedList = document.getElementById('feed-list');
-        feedList.innerHTML = '';
+        const feed = document.getElementById('feed-list');
+        feed.innerHTML = '';
+        let keys = Object.keys(db).sort(() => Math.random() - 0.5);
         
-        // Probabilité de pub
-        if(Math.random() > 0.7) {
-            feedList.innerHTML += `
-                <div class="post post-ad">
-                    <span class="ad-tag">📢 SPONSORISÉ</span>
-                    <h3>Offre exclusive pour vous</h3>
-                    <p>Basé sur vos intérêts récents, nous avons une opportunité unique à vous présenter. Cliquez pour en savoir plus.</p>
-                    <button class="btn-like" style="width:100%; background:#fef3c7">Voir l'offre</button>
-                </div>`;
-        }
-
-        // Générer 3 posts basés sur les poids
-        let pool = [];
-        config.forEach(c => {
-            for(let i=0; i < userProfile[c.id].interest; i++) pool.push(c);
-        });
-
-        for(let i=0; i<3; i++) {
-            const theme = pool[Math.floor(Math.random() * pool.length)];
-            const polar = userProfile[theme.id].polar;
-            const side = polar < 45 ? theme.optA : (polar > 55 ? theme.optB : "Neutre");
+        for(let i=0; i<4; i++) {
+            const k = keys[i % keys.length];
+            const p = profile[k].p;
+            let list = p < 40 ? db[k].A : (p > 60 ? db[k].B : db[k].N);
+            const title = list[Math.floor(Math.random() * list.length)];
             
-            feedList.innerHTML += `
+            feed.innerHTML += `
                 <div class="post">
-                    <span class="post-tag">${theme.label}</span>
-                    <h3>Pourquoi la ${side} est la clé aujourd'hui</h3>
-                    <p>Une analyse profonde montrant que dans le contexte actuel, la vision portée par la ${side} semble s'imposer d'elle-même...</p>
+                    <div><span class="post-tag">${db[k].label}</span><h3>${title}</h3></div>
                     <div class="actions">
-                        <button class="btn-like" onclick="action('${theme.id}', 'like')">J'aime 👍</button>
-                        <button class="btn-dislike" onclick="action('${theme.id}', 'dislike')">Bof 👎</button>
+                        <button class="btn-like" onclick="vote('${k}', true)">J'aime</button>
+                        <button class="btn-dislike" onclick="actionNight()">Bof</button>
                     </div>
                 </div>`;
         }
     }
 
-    function action(id, type) {
-        if(type === 'like') {
-            userProfile[id].interest += 15;
-            // On renforce le côté vers lequel on penche déjà (polarisation)
-            if(userProfile[id].polar >= 50) userProfile[id].polar = Math.min(95, userProfile[id].polar + 10);
-            else userProfile[id].polar = Math.max(5, userProfile[id].polar - 10);
-        } else {
-            userProfile[id].interest = Math.max(5, userProfile[id].interest - 5);
+    function vote(k, like) {
+        profile[k].i = Math.min(100, profile[k].i + 20);
+        if(like) {
+            if(profile[k].p >= 50) profile[k].p = Math.min(95, profile[k].p + 15);
+            else profile[k].p = Math.max(5, profile[k].p - 15);
         }
+        actionNight();
+    }
 
-        const night = document.getElementById('night');
-        night.style.display = 'flex';
-        currentDay++;
+    function actionNight() {
+        document.getElementById('night').style.display = 'flex';
+        const msgs = ["Tri des données...", "Analyse de vos goûts...", "Filtrage des opinions...", "Construction de votre bulle..."];
+        document.getElementById('night-msg').innerText = msgs[Math.floor(Math.random()*msgs.length)];
         
         setTimeout(() => {
-            night.style.display = 'none';
-            document.getElementById('day-ui').innerText = "Jour " + currentDay;
+            document.getElementById('night').style.display = 'none';
+            document.getElementById('day-ui').innerText = "Jour " + (++day);
             render();
-        }, 1200);
+        }, 3000); // 3 secondes pour bien laisser le temps d'expliquer
     }
 
-    function resetAll() {
-        currentDay = 1;
-        document.getElementById('day-ui').innerText = "Jour 1";
-        init();
-    }
-
-    init();
+    render();
 </script>
 </body>
 </html>
