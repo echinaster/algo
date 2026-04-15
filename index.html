@@ -304,41 +304,47 @@ function showFinalDashboard() {
     // 2. PHRASE DE DIAGNOSTIC
     area.innerHTML += `
         <p style="font-style: italic; color: #555; background: #f8f9fa; padding: 15px; border-radius: 8px; font-size: 0.9rem; margin-bottom: 25px; border-left: 4px solid var(--primary-violet);">
-            "Vous pensiez choisir ? J'ai simplement construit un miroir déformant autour de vous. 
-            Vos <strong>${state.angerClicks} signaux d'indignation</strong> ont été mon meilleur carburant."
+            "Vos <strong>${state.angerClicks} signaux d'indignation</strong> ont été mon meilleur carburant pour verrouiller votre bulle."
         </p>
     `;
 
-    // 3. LES JAUGES PAR THÈME
+    // 3. LES JAUGES PAR THÈME (Longueur proportionnelle aux clics)
     THEMES.forEach(t => {
         const s = state.scores[t.id];
-        const totalAB = s.countA + s.countB || 1;
         
-        area.innerHTML += `<div class="stat-row">
-            <div style="font-weight: bold; font-size: 0.9rem; margin-bottom: 5px; display:flex; justify-content:space-between;">
-                <span>${t.label}</span>
-                <span style="color:#aaa; font-weight:normal;">${s.clicks} clics</span>
-            </div>
-            <div class="gauge-bg">
-                <div class="gauge-fill-A" style="width: ${(s.countA/totalAB)*100}%"></div>
-                <div class="gauge-fill-B" style="width: ${(s.countB/totalAB)*100}%"></div>
-            </div>
-        </div>`;
+        // Calcul de la longueur totale de la barre (max 100%)
+        // On considère que 20 clics sur un thème = 100% de longueur
+        const longueurBarre = Math.min(100, (s.clicks / 20) * 100);
+        
+        // Calcul de la répartition interne
+        const totalAB = s.countA + s.countB || 1;
+        const ratioA = (s.countA / totalAB) * 100;
+        const ratioB = (s.countB / totalAB) * 100;
+
+        area.innerHTML += `
+            <div class="stat-row">
+                <div style="font-weight: bold; font-size: 0.9rem; margin-bottom: 5px; display:flex; justify-content:space-between;">
+                    <span>${t.label}</span>
+                    <span style="color:#aaa; font-weight:normal;">${s.clicks} clics</span>
+                </div>
+                <div class="gauge-bg" style="width: ${longueurBarre}%; min-width: 5px;">
+                    <div class="gauge-fill-A" style="width: ${ratioA}%"></div>
+                    <div class="gauge-fill-B" style="width: ${ratioB}%"></div>
+                </div>
+            </div>`;
     });
 
-    // 4. LA LÉGENDE (NOUVEAU)
+    // 4. LA LÉGENDE
     area.innerHTML += `
         <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
-            <div style="font-size: 0.8rem; font-weight: bold; text-transform: uppercase; color: #95a5a6; margin-bottom: 15px;">Légende du profil :</div>
-            
-            <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                <div style="width: 20px; height: 12px; background: var(--primary-violet); border-radius: 3px; margin-right: 10px;"></div>
-                <div style="font-size: 0.9rem;"><strong>Moderne / Inquiet :</strong> Obsession du contrôle, peur du futur, humour noir.</div>
+            <div style="font-size: 0.8rem; font-weight: bold; text-transform: uppercase; color: #95a5a6; margin-bottom: 10px;">Légende du profil :</div>
+            <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                <div style="width: 15px; height: 10px; background: var(--primary-violet); border-radius: 2px; margin-right: 10px;"></div>
+                <div style="font-size: 0.85rem;"><strong>Moderne / Inquiet :</strong> Futur, contrôle, cynisme.</div>
             </div>
-            
             <div style="display: flex; align-items: center;">
-                <div style="width: 20px; height: 12px; background: var(--primary-orange); border-radius: 3px; margin-right: 10px;"></div>
-                <div style="font-size: 0.9rem;"><strong>Tradition / Nostalgie :</strong> "C'était mieux avant", rumeurs anciennes, terroir.</div>
+                <div style="width: 15px; height: 10px; background: var(--primary-orange); border-radius: 2px; margin-right: 10px;"></div>
+                <div style="font-size: 0.85rem;"><strong>Tradition / Nostalgie :</strong> Terroir, passé, rumeurs.</div>
             </div>
         </div>
     `;
