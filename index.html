@@ -309,23 +309,45 @@ function nextDay() {
 
 function showFinalDashboard() {
     document.getElementById('dashboard').classList.add('visible');
-    document.getElementById('ia-final-speech').innerText = "Félicitations. Vous avez été parfaitement modélisé. Voici votre portrait robot algorithmique.";
+    
+    // Phrases de diagnostic personnalisées
+    const jourBascule = state.basculeDay || 14; 
+    const ratioColere = Math.round((state.angerClicks / state.totalActions) * 100);
+
+    document.getElementById('ia-final-speech').innerHTML = `
+        <strong>Diagnostic : Radicalisation réussie.</strong><br><br>
+        Votre "Point de Bascule" a été détecté au <strong>Jour ${jourBascule}</strong>.<br>
+        À cet instant précis, j'ai cessé de vous proposer la réalité pour ne vous montrer que ce qui flatte vos biais.<br><br>
+        <strong>${ratioColere}%</strong> de vos interactions étaient basées sur l'indignation. Plus vous avez détesté, plus je vous ai enfermé.
+    `;
+
     const area = document.getElementById('stats-area');
     area.innerHTML = '';
+
     THEMES.forEach(t => {
         const s = state.scores[t.id];
-        const totalInterest = Math.min(100, (s.interest / 400) * 100);
+        // On calcule la longueur de la barre (Intérêt) : max à 400 pts
+        const totalInterestWidth = Math.min(100, (s.interest / 400) * 100);
+        
+        // Répartition interne A vs B
         const totalAB = s.countA + s.countB || 1;
+        const percentA = (s.countA / totalAB) * 100;
+        const percentB = (s.countB / totalAB) * 100;
+
         area.innerHTML += `
             <div class="stat-row">
-                <div style="font-weight: 700; margin-bottom: 5px;">${t.label}</div>
-                <div class="gauge-container" style="width: ${totalInterest}%">
-                    <div class="gauge-A" style="width: ${(s.countA/totalAB)*100}%"></div>
-                    <div class="gauge-B" style="width: ${(s.countB/totalAB)*100}%"></div>
+                <div style="font-weight: bold; font-size: 0.9rem; margin-bottom: 5px; display:flex; justify-content:space-between;">
+                    <span>${t.label}</span>
+                    <span style="color:#aaa; font-weight:normal;">${s.clicks} contenus</span>
+                </div>
+                <div class="gauge-container" style="width: ${totalInterestWidth}%">
+                    <div class="gauge-A" style="width: ${percentA}%"></div>
+                    <div class="gauge-B" style="width: ${percentB}%"></div>
                 </div>
             </div>`;
     });
 }
+    
 window.onload = renderFeed;
 </script>
 </body>
