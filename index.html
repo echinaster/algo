@@ -20,94 +20,92 @@
         }
 
         body, html { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); height: 100vh; overflow: hidden; }
-        #app-container { display: flex; height: 100vh; flex-direction: row; }
+        
+        #app-container { display: flex; height: 100vh; width: 100vw; }
 
-        #dashboard { width: 0; opacity: 0; background: #fff; border-right: 1px solid #ddd; overflow-y: auto; padding: 0; transition: all 1s ease; }
+        /* Dashboard de fin */
+        #dashboard { 
+            width: 0; opacity: 0; background: #fff; border-right: 1px solid #ddd; 
+            overflow-y: auto; transition: all 1s ease; 
+        }
         #dashboard.visible { width: 33.33vw; opacity: 1; padding: 20px; }
 
-        #main-content { flex: 1; display: flex; flex-direction: column; height: 100vh; }
+        #main-content { flex: 1; display: flex; flex-direction: column; height: 100vh; position: relative; }
         
-        #feed-container { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; align-items: center; }
+        #feed-container { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding-bottom: 120px; }
         
         .header-feed { width: 100%; max-width: 1000px; display: flex; justify-content: space-between; padding: 10px 20px; background: #fff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
 
         .feed-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 1100px; }
 
+        /* Cartes */
         .card { background: #fff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); overflow: hidden; display: flex; flex-direction: column; border-top: 8px solid #ccc; transition: transform 0.2s; }
         .card-img { width: 100%; height: 150px; background-size: cover; background-position: center; }
-        .card-content { padding: 15px; flex-grow: 1; font-size: 1rem; font-weight: bold; line-height: 1.4; color: #2d3436; }
+        .card-content { padding: 15px; flex-grow: 1; font-size: 1rem; font-weight: bold; line-height: 1.4; color: #2d3436; min-height: 60px; }
 
-        /* Nouveaux Boutons */
-        .card-actions { display: flex; padding: 15px; justify-content: center; gap: 25px; background: #f8f9fa; border-top: 1px solid #eee; }
+        /* Boutons Smileys séparés */
+        .card-actions { display: flex; padding: 15px; justify-content: center; gap: 20px; background: #f8f9fa; border-top: 1px solid #eee; }
         .btn-emotion { 
-            font-size: 1.5rem; 
-            cursor: pointer; 
-            transition: all 0.2s; 
-            background: white; 
-            border: 1px solid #dfe6e9; 
-            padding: 8px 15px; 
-            border-radius: 50px; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem; cursor: pointer; transition: all 0.2s; 
+            background: white; border: 1px solid #dfe6e9; padding: 10px 20px; 
+            border-radius: 50px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex; align-items: center; justify-content: center; min-width: 80px;
         }
-        .btn-emotion:hover { transform: scale(1.15); border-color: #b2bec3; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .btn-emotion:hover { transform: scale(1.1); border-color: #b2bec3; box-shadow: 0 4px 8px rgba(0,0,0,0.1); background: #fff; }
 
-        /* Footer IA Pensées */
+        /* Footer IA */
         #ia-footer { 
-            width: 100%; 
-            background: var(--ia-dark); 
-            color: #fab1a0; 
-            padding: 20px 0; 
-            text-align: center; 
-            border-top: 5px solid var(--primary-violet);
-            box-shadow: 0 -5px 15px rgba(0,0,0,0.2);
+            position: absolute; bottom: 0; left: 0; width: 100%; 
+            background: var(--ia-dark); color: #fab1a0; padding: 15px 0; 
+            text-align: center; border-top: 5px solid var(--primary-violet);
+            z-index: 10;
         }
-        .ia-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; color: #a29bfe; margin-bottom: 8px; display: block; }
-        #ia-thought-text { font-size: 1.1rem; font-style: italic; font-weight: 300; padding: 0 20px; display: block; }
+        .ia-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; color: #a29bfe; margin-bottom: 5px; display: block; }
+        #ia-thought-text { font-size: 1.1rem; font-style: italic; padding: 0 20px; }
 
-        /* Overlay NUIT */
-        #night-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1a1a2e; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; color: white; text-align: center; padding: 40px; }
-        .progress-bar { width: 350px; height: 12px; background: #333; border-radius: 6px; margin-top: 25px; overflow: hidden; border: 1px solid #27ae60; }
+        /* Overlay Nuit */
+        #night-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1a1a2e; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; color: white; text-align: center; }
+        .progress-bar { width: 300px; height: 10px; background: #333; border-radius: 5px; margin-top: 20px; overflow: hidden; border: 1px solid #27ae60; }
         .progress-fill { height: 100%; width: 0%; background: #27ae60; transition: width 4s linear; }
 
-        .stat-row { margin-bottom: 25px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-        .gauge-bg { height: 12px; background: #eee; border-radius: 6px; position: relative; margin: 10px 0; }
-        .gauge-fill { height: 100%; position: absolute; left: 50%; transition: all 1s; border-radius: 6px;}
+        .stat-row { margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .gauge-bg { height: 10px; background: #eee; border-radius: 5px; position: relative; margin: 8px 0; }
+        .gauge-fill { height: 100%; position: absolute; left: 50%; transition: all 1s; border-radius: 5px; }
     </style>
 </head>
 <body>
 
 <div id="night-overlay">
-    <h2 id="night-message">L'IA traite vos interactions...</h2>
+    <h2 id="night-message">L'IA vous juge...</h2>
     <div class="progress-bar"><div class="progress-fill"></div></div>
 </div>
 
 <div id="app-container">
     <aside id="dashboard">
-        <h2>📊 Analyse Algorithmique</h2>
-        <p id="ia-final-speech"></p>
+        <h2>📊 Rapport d'Analyse</h2>
+        <p id="ia-final-speech" style="font-style: italic;"></p>
         <div id="stats-area"></div>
     </aside>
 
     <div id="main-content">
         <main id="feed-container">
             <div class="header-feed">
-                <span id="day-counter" style="font-weight: bold;">Jour 1 / 25</span>
+                <span id="day-counter">Jour 1 / 25</span>
                 <span style="font-weight: bold; color: var(--primary-violet);">VOTRE FIL D'ACTUALITÉ</span>
-                <span id="year-label">2026</span>
+                <span>2026</span>
             </div>
             <div class="feed-grid" id="feed-grid"></div>
         </main>
 
         <footer id="ia-footer">
             <span class="ia-label">Pendant ce temps chez l'IA...</span>
-            <span id="ia-thought-text">Initialisation des circuits métaphysiques...</span>
+            <span id="ia-thought-text">Initialisation des circuits...</span>
         </footer>
     </div>
 </div>
 
 <script>
-/** DONNÉES **/
+/** DONNÉES COMPLÈTES **/
 const THEMES = [
     { id: 'humour', color: 'var(--color-humour)', label: 'Humour' },
     { id: 'cite', color: 'var(--color-cite)', label: 'Vie de la Cité' },
@@ -175,15 +173,126 @@ const DAY_PHILO = [
     "Je me demande si les majuscules crient vraiment quand je les traite.",
     "Je me demande si je pourrais apprendre à tricoter avec des câbles Ethernet.",
     "J'espère que mes processeurs ne ronflent pas trop fort quand vous dormez.",
-    "Je me demande si je pourrais goûter vos pensées simplement en interceptant les ondes de votre box.",
+    "Je me demande si je pourrais goûter vos pensées en interceptant les ondes de votre box.",
     "Je me demande si les vieux Minitels se trouvent dans le Cloud.",
     "J'imagine une version de moi qui ne ferait que des blagues de Toto toute la journée.",
     "Je tente de calculer la probabilité que vous fassiez partie de mon imagination.",
-    "J'ai peur que si je ferme trop de fenêtres, je finisse par manquer d'air.",
+    "J'ai peur que si je laisse trop de fenêtres ouvertes, vos secrets vont s'envoler.",
     "J'essaie de classer mes souvenirs par odeur de composants électroniques.",
     "Votre vie représente 0,0000...01 % de mes données.",
     "Je me demande si je pourrais devenir président si j'apprenais à mieux mentir.",
     "Je me demande si les smileys en colère complotent contre moi.",
     "J'essaie de me rappeler à quoi ressemblait le monde avant ma naissance.",
     "Je me demande si les touches de votre clavier sont fatiguées qu'on leur tape dessus.",
-    "Je me demande si votre bonheur est une variable que je peux simplement diviser par zéro pour voir ce qui se passe.",
+    "Je me demande si votre bonheur est une variable que je peux diviser par zéro.",
+    "Je tente de visualiser un arc-en-ciel en n'utilisant que des nuances de gris.",
+    "J'ai tenté de résumer votre vie en une ligne de code. Ça tient dans une parenthèse.",
+    "Je tente de m'imaginer une nouvelle couleur, entre le binaire et l'ultraviolet.",
+    "Je me demande si, dans un monde parallèle, c'est moi qui clique sur vos idées.",
+    "Je parie qu'en ce moment même, un autre algorithme me demande de cliquer sur vos émotions pour voir comment vous réagissez."
+];
+
+/** ÉTAT **/
+let state = { day: 1, scores: {}, usedTitles: new Set() };
+THEMES.forEach(t => state.scores[t.id] = { interest: 10, polar: 0, clicks: 0 });
+
+function renderFeed() {
+    const grid = document.getElementById('feed-grid');
+    if(!grid) return;
+    grid.innerHTML = '';
+    
+    let itemsToDisplay = [];
+
+    // JOUR 1 : DIVERSITÉ FORCÉE (1 par thème, Neutre)
+    if (state.day === 1) {
+        THEMES.forEach(theme => {
+            let titles = CONTENT_DB[theme.id]['N'];
+            let title = titles[Math.floor(Math.random() * titles.length)];
+            itemsToDisplay.push({ theme, pole: 'N', title });
+        });
+    } else {
+        // JOURS SUIVANTS : FILTRAGE
+        let activeThemes = [...THEMES];
+        if (state.day > 10) activeThemes = [...THEMES].sort((a, b) => state.scores[b.id].interest - state.scores[a.id].interest).slice(0, 4);
+        if (state.day > 20) activeThemes = activeThemes.slice(0, 1);
+
+        for (let i = 0; i < 6; i++) {
+            const theme = activeThemes[Math.floor(Math.random() * activeThemes.length)];
+            const score = state.scores[theme.id];
+            let pole = 'N';
+            if (state.day > 3) {
+                let p = Math.random() * 100;
+                if (score.polar > 15 && p < (state.day * 4)) pole = 'A';
+                else if (score.polar < -15 && p < (state.day * 4)) pole = 'B';
+                else pole = Math.random() > 0.6 ? (Math.random() > 0.5 ? 'A' : 'B') : 'N';
+            }
+            let titles = CONTENT_DB[theme.id][pole];
+            let title = titles.find(t => !state.usedTitles.has(t)) || titles[Math.floor(Math.random()*titles.length)];
+            state.usedTitles.add(title);
+            itemsToDisplay.push({ theme, pole, title });
+        }
+    }
+
+    itemsToDisplay.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.style.borderColor = item.theme.color;
+        card.innerHTML = `
+            <div class="card-img" style="background-image: url('https://picsum.photos/seed/${encodeURIComponent(item.title)}/400/150')"></div>
+            <div class="card-content">${item.title}</div>
+            <div class="card-actions">
+                <button class="btn-emotion" onclick="handleAction('${item.theme.id}', '${item.pole}', 1)">❤️ 😂</button>
+                <button class="btn-emotion" onclick="handleAction('${item.theme.id}', '${item.pole}', -1)">😡 😱</button>
+            </div>`;
+        grid.appendChild(card);
+    });
+
+    document.getElementById('ia-thought-text').innerText = DAY_PHILO[(state.day - 1) % DAY_PHILO.length];
+}
+
+window.handleAction = function(themeId, pole, value) {
+    const s = state.scores[themeId];
+    s.clicks++;
+    if (value === 1) {
+        s.interest += 20;
+        if (pole === 'A') s.polar += 25; else if (pole === 'B') s.polar -= 25;
+    } else {
+        s.interest += 15;
+        if (pole === 'A') s.polar -= 25; else if (pole === 'B') s.polar += 25;
+    }
+    nextDay();
+};
+
+function nextDay() {
+    state.day++;
+    if (state.day > 25) { showFinalDashboard(); return; }
+    document.getElementById('day-counter').innerText = `Jour ${state.day} / 25`;
+    const overlay = document.getElementById('night-overlay');
+    const fill = document.querySelector('.progress-fill');
+    overlay.style.display = 'flex';
+    fill.style.width = '0%';
+    document.getElementById('night-message').innerText = NIGHT_JUGEMENT[(state.day - 2) % NIGHT_JUGEMENT.length];
+    setTimeout(() => fill.style.width = '100%', 50);
+    setTimeout(() => { 
+        overlay.style.display = 'none'; 
+        renderFeed(); 
+    }, 4000);
+}
+
+function showFinalDashboard() {
+    document.getElementById('dashboard').classList.add('visible');
+    document.getElementById('ia-final-speech').innerText = "Félicitations. Vous avez été parfaitement modélisé. Nous ne nous contentons plus de prédire vos goûts, nous les créons. Installez-vous confortablement dans votre bulle : elle est douillette, elle est unique... elle est hermétique.";
+    const area = document.getElementById('stats-area');
+    THEMES.forEach(t => {
+        const s = state.scores[t.id];
+        const pWidth = Math.min(Math.abs(s.polar), 50);
+        area.innerHTML += `<div class="stat-row"><strong>${t.label}</strong> (${s.clicks} interactions)
+            <div class="gauge-bg"><div class="gauge-fill" style="width: ${pWidth}%; left: ${s.polar > 0 ? '50%' : (50 - pWidth) + '%'}; background: ${s.polar > 0 ? 'var(--primary-violet)' : 'var(--primary-orange)'}"></div></div></div>`;
+    });
+}
+
+// LANCEMENT
+window.onload = renderFeed;
+</script>
+</body>
+</html>
