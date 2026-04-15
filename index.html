@@ -30,16 +30,59 @@
             box-sizing: border-box; margin: 10px auto; border-radius: 12px;
         }
 
-        .ia-notif-zone { display: flex; align-items: center; gap: 15px; position: relative; }
-        .bell-icon { font-size: 1.5rem; position: relative; cursor: pointer; }
-        .bell-badge { position: absolute; top: -5px; right: -5px; background: #e74c3c; color: white; font-size: 0.7rem; padding: 2px 6px; border-radius: 50%; font-weight: bold; border: 2px solid #fff; }
-        
-        #ia-bubble { 
-            background: #2d3436; color: #fab1a0; padding: 8px 15px; border-radius: 10px; 
-            font-size: 0.85rem; font-style: italic; max-width: 250px; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            animation: fadeIn 0.5s ease;
-        }
+.ia-notif-zone { 
+        display: flex; 
+        align-items: center; 
+        gap: 15px; 
+        position: relative; 
+    }
+.bell-icon { 
+        font-size: 1.6rem; 
+        cursor: pointer; 
+        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+    }
+.bell-badge { 
+        position: absolute; 
+        top: -5px; 
+        right: -5px; 
+        background: #ff7675; 
+        color: white; 
+        font-size: 0.7rem; 
+        padding: 2px 6px; 
+        border-radius: 50%; 
+        font-weight: bold; 
+        border: 2px solid #fff; 
+    }        
+#ia-bubble { 
+        background: #ffffff; 
+        color: #2d3436; 
+        padding: 12px 18px; 
+        border-radius: 12px; 
+        font-size: 0.9rem; 
+        font-style: italic; 
+        max-width: 280px; 
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        border: 2px solid var(--primary-violet);
+        position: relative;
+        opacity: 0; /* Caché au départ pour l'animation */
+        transform: translateY(5px);
+        transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+        #ia-bubble::after {
+        content: '';
+        position: absolute;
+        right: -10px;
+        top: 50%;
+        transform: translateY(-50%);
+        border-width: 5px;
+        border-style: solid;
+        border-color: transparent transparent transparent var(--primary-violet);
+    }
+
+    #ia-bubble.active {
+        opacity: 1;
+        transform: translateY(0);
+    }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
 
@@ -67,6 +110,7 @@
         .gauge-fill-A { height: 100%; background: var(--primary-violet); transition: width 1s; }
         .gauge-fill-B { height: 100%; background: var(--primary-orange); transition: width 1s; }
     </style>
+    
 </head>
 <body>
 
@@ -98,7 +142,7 @@
         </main>
     </div>
 </div>
-
+<audio id="notif-sound" src="https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3"></audio>
 <script>
 /** DONNÉES **/
 const THEMES = [
@@ -248,8 +292,24 @@ function renderFeed() {
     });
 
     // Mise à jour de la notification IA
+    function triggerIANotification() {
     const bubble = document.getElementById('ia-bubble');
-    bubble.innerText = DAY_PHILO[(state.day - 1) % DAY_PHILO.length];
+    const sound = document.getElementById('notif-sound');
+    
+    // 1. On cache la bulle
+    bubble.classList.remove('active');
+    bubble.innerText = "";
+    
+    // 2. On attend un petit délai après l'ouverture du jour
+    setTimeout(() => {
+        // 3. On joue le son
+        sound.play().catch(e => console.log("Son bloqué par le navigateur"));
+        
+        // 4. On injecte le texte et on affiche avec animation
+        bubble.innerText = DAY_PHILO[(state.day - 1) % DAY_PHILO.length];
+        bubble.classList.add('active');
+    }, 800); // Délai de 0.8s pour laisser le fil s'afficher
+}
 }
 
 window.handleAction = function(themeId, pole, value) {
@@ -277,14 +337,22 @@ window.handleAction = function(themeId, pole, value) {
 function nextDay() {
     state.day++;
     if (state.day > 25) { showFinalDashboard(); return; }
+    
     document.getElementById('day-counter').innerText = `Jour ${state.day} / 25`;
     const overlay = document.getElementById('night-overlay');
     const fill = document.querySelector('.progress-fill');
+    
     overlay.style.display = 'flex';
     fill.style.width = '0%';
     document.getElementById('night-message').innerText = NIGHT_JUGEMENT[(state.day - 2) % NIGHT_JUGEMENT.length];
+    
     setTimeout(() => fill.style.width = '100%', 50);
-    setTimeout(() => { overlay.style.display = 'none'; renderFeed(); }, 4000);
+    
+    setTimeout(() => { 
+        overlay.style.display = 'none'; 
+        renderFeed(); 
+        triggerIANotification(); // <--- APPEL ICI
+    }, 4000);
 }
 
 function showFinalDashboard() {
@@ -349,7 +417,11 @@ function showFinalDashboard() {
         </div>
     `;
 }
-renderFeed();
+// --- LE DÉMARREUR EST ICI ---
+    window.onload = () => {
+        renderFeed(); // Affiche les cartes du Jour 1
+        setTimeout(triggerIANotification, 1000); // Fait popper la notification après 1 sec
+    };
 </script>
 </body>
 </html>
