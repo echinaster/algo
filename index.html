@@ -291,19 +291,29 @@ function showFinalDashboard() {
     document.getElementById('dashboard').classList.add('visible');
     const area = document.getElementById('stats-area');
     area.innerHTML = '';
+
+    // 1. CARTE CHOC : LE JOUR DE BASCULE
     area.innerHTML += `
         <div class="stat-card-bascule">
             <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px;">Alerte : Profil Modélisé</div>
             <div style="font-size: 2.5rem; font-weight: 900;">JOUR ${state.basculeDay || 12}</div>
             <div style="font-size: 0.9rem;">L'IA a pris le contrôle total.</div>
         </div>
-        <p style="font-style: italic; color: #555; background: #eee; padding: 15px; border-radius: 8px; font-size: 0.9rem; margin-bottom: 25px;">
-            Vous avez généré <strong>${state.angerClicks} signaux d'indignation</strong>. Plus vous avez détesté, plus j'ai pu vous enfermer.
+    `;
+
+    // 2. PHRASE DE DIAGNOSTIC
+    area.innerHTML += `
+        <p style="font-style: italic; color: #555; background: #f8f9fa; padding: 15px; border-radius: 8px; font-size: 0.9rem; margin-bottom: 25px; border-left: 4px solid var(--primary-violet);">
+            "Vous pensiez choisir ? J'ai simplement construit un miroir déformant autour de vous. 
+            Vos <strong>${state.angerClicks} signaux d'indignation</strong> ont été mon meilleur carburant."
         </p>
     `;
+
+    // 3. LES JAUGES PAR THÈME
     THEMES.forEach(t => {
         const s = state.scores[t.id];
         const totalAB = s.countA + s.countB || 1;
+        
         area.innerHTML += `<div class="stat-row">
             <div style="font-weight: bold; font-size: 0.9rem; margin-bottom: 5px; display:flex; justify-content:space-between;">
                 <span>${t.label}</span>
@@ -315,6 +325,23 @@ function showFinalDashboard() {
             </div>
         </div>`;
     });
+
+    // 4. LA LÉGENDE (NOUVEAU)
+    area.innerHTML += `
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+            <div style="font-size: 0.8rem; font-weight: bold; text-transform: uppercase; color: #95a5a6; margin-bottom: 15px;">Légende du profil :</div>
+            
+            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                <div style="width: 20px; height: 12px; background: var(--primary-violet); border-radius: 3px; margin-right: 10px;"></div>
+                <div style="font-size: 0.9rem;"><strong>Moderne / Inquiet :</strong> Obsession du contrôle, peur du futur, humour noir.</div>
+            </div>
+            
+            <div style="display: flex; align-items: center;">
+                <div style="width: 20px; height: 12px; background: var(--primary-orange); border-radius: 3px; margin-right: 10px;"></div>
+                <div style="font-size: 0.9rem;"><strong>Tradition / Nostalgie :</strong> "C'était mieux avant", rumeurs anciennes, terroir.</div>
+            </div>
+        </div>
+    `;
 }
 renderFeed();
 </script>
