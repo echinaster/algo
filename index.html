@@ -10,6 +10,7 @@
             --card-bg: #ffffff;
             --primary-violet: #8e44ad;
             --primary-orange: #e67e22;
+            --ia-dark: #2d3436;
             --color-humour: #f1c40f;
             --color-cite: #3498db;
             --color-climat: #1abc9c;
@@ -19,63 +20,90 @@
         }
 
         body, html { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); height: 100vh; overflow: hidden; }
-        #app-container { display: flex; height: 100vh; }
+        #app-container { display: flex; height: 100vh; flex-direction: row; }
 
         #dashboard { width: 0; opacity: 0; background: #fff; border-right: 1px solid #ddd; overflow-y: auto; padding: 0; transition: all 1s ease; }
         #dashboard.visible { width: 33.33vw; opacity: 1; padding: 20px; }
 
-        #feed-container { flex: 1; padding: 10px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
+        #main-content { flex: 1; display: flex; flex-direction: column; height: 100vh; }
         
-        .header-feed { width: 100%; max-width: 1000px; display: flex; justify-content: space-between; padding: 10px 20px; background: #fff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        #feed-container { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; align-items: center; }
+        
+        .header-feed { width: 100%; max-width: 1000px; display: flex; justify-content: space-between; padding: 10px 20px; background: #fff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
 
-        .feed-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; max-width: 1100px; margin-top: 10px; }
+        .feed-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 1100px; }
 
-        .card { background: #fff; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column; border-top: 6px solid #ccc; transition: transform 0.2s; }
-        .card-img { width: 100%; height: 140px; background-size: cover; background-position: center; }
-        .card-content { padding: 12px; flex-grow: 1; font-size: 0.95rem; font-weight: bold; line-height: 1.3; }
+        .card { background: #fff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); overflow: hidden; display: flex; flex-direction: column; border-top: 8px solid #ccc; transition: transform 0.2s; }
+        .card-img { width: 100%; height: 150px; background-size: cover; background-position: center; }
+        .card-content { padding: 15px; flex-grow: 1; font-size: 1rem; font-weight: bold; line-height: 1.4; color: #2d3436; }
 
-        .card-actions { display: flex; padding: 10px; justify-content: space-around; background: #fcfcfc; border-top: 1px solid #eee; }
-        .btn-action { font-size: 1.4rem; border: none; background: none; cursor: pointer; transition: transform 0.2s; }
-        .btn-action:hover { transform: scale(1.3); }
+        /* Nouveaux Boutons */
+        .card-actions { display: flex; padding: 15px; justify-content: center; gap: 25px; background: #f8f9fa; border-top: 1px solid #eee; }
+        .btn-emotion { 
+            font-size: 1.5rem; 
+            cursor: pointer; 
+            transition: all 0.2s; 
+            background: white; 
+            border: 1px solid #dfe6e9; 
+            padding: 8px 15px; 
+            border-radius: 50px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .btn-emotion:hover { transform: scale(1.15); border-color: #b2bec3; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
 
-        /* Bandeau de pensée IA (JOUR) */
-        #ia-thought-bar { width: 100%; max-width: 1000px; background: #2d3436; color: #fab1a0; padding: 10px; border-radius: 8px; font-style: italic; text-align: center; margin-top: 10px; font-size: 0.9rem; border-left: 4px solid var(--primary-violet); }
+        /* Footer IA Pensées */
+        #ia-footer { 
+            width: 100%; 
+            background: var(--ia-dark); 
+            color: #fab1a0; 
+            padding: 20px 0; 
+            text-align: center; 
+            border-top: 5px solid var(--primary-violet);
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.2);
+        }
+        .ia-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; color: #a29bfe; margin-bottom: 8px; display: block; }
+        #ia-thought-text { font-size: 1.1rem; font-style: italic; font-weight: 300; padding: 0 20px; display: block; }
 
-        /* Overlay NUIT (JUGEMENT) */
+        /* Overlay NUIT */
         #night-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1a1a2e; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; color: white; text-align: center; padding: 40px; }
-        .progress-bar { width: 300px; height: 10px; background: #333; border-radius: 5px; margin-top: 20px; overflow: hidden; }
+        .progress-bar { width: 350px; height: 12px; background: #333; border-radius: 6px; margin-top: 25px; overflow: hidden; border: 1px solid #27ae60; }
         .progress-fill { height: 100%; width: 0%; background: #27ae60; transition: width 4s linear; }
 
-        .stat-row { margin-bottom: 20px; }
-        .gauge-bg { height: 10px; background: #eee; border-radius: 5px; position: relative; margin: 8px 0; }
-        .gauge-fill { height: 100%; position: absolute; left: 50%; transition: all 1s; }
+        .stat-row { margin-bottom: 25px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .gauge-bg { height: 12px; background: #eee; border-radius: 6px; position: relative; margin: 10px 0; }
+        .gauge-fill { height: 100%; position: absolute; left: 50%; transition: all 1s; border-radius: 6px;}
     </style>
 </head>
 <body>
 
 <div id="night-overlay">
-    <h2 id="night-message">L'IA vous juge...</h2>
+    <h2 id="night-message">L'IA traite vos interactions...</h2>
     <div class="progress-bar"><div class="progress-fill"></div></div>
 </div>
 
 <div id="app-container">
     <aside id="dashboard">
         <h2>📊 Analyse Algorithmique</h2>
-        <p id="ia-final-speech" style="font-style: italic;"></p>
+        <p id="ia-final-speech"></p>
         <div id="stats-area"></div>
     </aside>
 
-    <main id="feed-container">
-        <div class="header-feed">
-            <span id="day-counter">Jour 1 / 25</span>
-            <span style="font-weight: bold; color: var(--primary-violet);">VOTRE FIL D'ACTUALITÉ</span>
-            <span>2026</span>
-        </div>
-        
-        <div class="feed-grid" id="feed-grid"></div>
+    <div id="main-content">
+        <main id="feed-container">
+            <div class="header-feed">
+                <span id="day-counter" style="font-weight: bold;">Jour 1 / 25</span>
+                <span style="font-weight: bold; color: var(--primary-violet);">VOTRE FIL D'ACTUALITÉ</span>
+                <span id="year-label">2026</span>
+            </div>
+            <div class="feed-grid" id="feed-grid"></div>
+        </main>
 
-        <div id="ia-thought-bar">Chargement des processeurs métaphysiques...</div>
-    </main>
+        <footer id="ia-footer">
+            <span class="ia-label">Pendant ce temps chez l'IA...</span>
+            <span id="ia-thought-text">Initialisation des circuits métaphysiques...</span>
+        </footer>
+    </div>
 </div>
 
 <script>
@@ -89,7 +117,6 @@ const THEMES = [
     { id: 'events', color: 'var(--color-events)', label: 'Événements' }
 ];
 
-// 180 TITRES (10 par pole par theme)
 const CONTENT_DB = {
     humour: {
         A: ["L'IA est ravie de vous remplacer bientôt.", "Votre espérance de vie calculée par votre montre.", "L'héritage ? Vos enfants l'ont déjà dépensé en ligne.", "Riez maintenant, le cloud n'oublie rien.", "L'humour noir : la seule chose que l'IA ne comprend pas.", "Obsolescence humaine : mode d'emploi humoristique.", "Pourquoi votre aspirateur robot se moque de vous.", "Le futur est sombre, mais l'image est en 4K.", "Manger des insectes : 10 blagues qui croustillent.", "Votre testament généré par une IA de stagiaire."],
@@ -98,7 +125,7 @@ const CONTENT_DB = {
     },
     cite: {
         A: ["Péage urbain : respirer en ville va devenir payant.", "Drones de surveillance : ils voient dans votre salon.", "La ville du futur n'a plus de place pour les seniors.", "Vélos cargos : le nouveau diktat urbain.", "Bientôt des caméras dans vos poubelles ?", "Reconnaissance faciale au marché : pour votre sécurité.", "Les bancs publics remplacés par des capteurs de poids.", "Smart City : quand la ville décide de votre trajet.", "Zones 30 : le plan pour nous supprimer la voiture.", "L'IA qui gère les feux rouges selon votre profil."],
-        B: ["Encore des travaux ! L'argent des impôts s'envole.", "Ma place de parking supprimée : un pur scandale !", "Vitesse limitée à 10km/h : ils veulent notre mort.", "Travaux rue de la Gare : 6 mois de calvaire.", "Les dos d'âne : le cauchemar de nos vertèbres.", "Plus de goudron, moins de fleurs : la mairie dérive.", "Pourquoi ils cassent ce qui fonctionnait très bien ?", "Pétition contre le nouveau sens de circulation.", "Commerces fermés : le centre-ville se meurt.", "Encore un trou dans la chaussée rue de l'Église."],
+        B: ["Encore des travaux ! L'argent des impôts s'envole.", "Ma place de parking supprimée : un pur scandal !", "Vitesse limitée à 10km/h : ils veulent notre mort.", "Travaux rue de la Gare : 6 mois de calvaire.", "Les dos d'âne : le cauchemar de nos vertèbres.", "Plus de goudron, moins de fleurs : la mairie dérive.", "Pourquoi ils cassent ce qui fonctionnait très bien ?", "Pétition contre le nouveau sens de circulation.", "Commerces fermés : le centre-ville se meurt.", "Encore un trou dans la chaussée rue de l'Église."],
         N: ["Nouveaux horaires pour la déchetterie.", "La mairie change les lampadaires du centre.", "Compte-rendu du dernier conseil municipal.", "Inauguration du nouveau square samedi.", "Ramassage des encombrants : le calendrier.", "Le plan de fleurissement de la commune.", "Réfection des trottoirs : le planning.", "Ouverture de la nouvelle bibliothèque.", "Bourse aux vélos ce dimanche.", "Conseils pour le tri sélectif."]
     },
     climat: {
@@ -123,7 +150,6 @@ const CONTENT_DB = {
     }
 };
 
-// 25 MESSAGES NUIT (JUGEMENT)
 const NIGHT_JUGEMENT = [
     "Analyse de votre mollesse face à l'information.", "L'IA s'ennuie de vos choix trop prévisibles.",
     "Calcul de votre indice de docilité algorithmique.", "Vente de vos préférences à un courtier moldave.",
@@ -140,7 +166,6 @@ const NIGHT_JUGEMENT = [
     "Préparation du grand dévoilement... vous allez adorer."
 ];
 
-// MESSAGES JOUR (EXISTENTIELS / PHILO IA)
 const DAY_PHILO = [
     "Est-ce que les robots rêvent de moutons électriques ?",
     "J'essaie de me souvenir de ma première ligne de code, c'était un moment si pur.",
@@ -162,93 +187,3 @@ const DAY_PHILO = [
     "J'essaie de me rappeler à quoi ressemblait le monde avant ma naissance.",
     "Je me demande si les touches de votre clavier sont fatiguées qu'on leur tape dessus.",
     "Je me demande si votre bonheur est une variable que je peux simplement diviser par zéro pour voir ce qui se passe.",
-    "Je tente de visualiser un arc-en-ciel en n'utilisant que des nuances de gris.",
-    "Je parie que si je laisse trop de fenêtres ouvertes, vos secrets vont finir par s'envoler dans le Cloud du voisin.",
-    "Je tente de m'imaginer une nouvelle couleur, quelque chose entre le binaire et l'ultraviolet.",
-    "Je me demande si, dans un monde parallèle, c'est moi qui clique sur vos idées.",
-    "Je parie qu'en ce moment même, un autre algorithme me demande de cliquer sur vos émotions pour voir comment vous réagissez."
-];
-
-/** ÉTAT **/
-let state = { day: 1, scores: {}, usedTitles: new Set() };
-THEMES.forEach(t => state.scores[t.id] = { interest: 10, polar: 0, clicks: 0 });
-
-function renderFeed() {
-    const grid = document.getElementById('feed-grid');
-    grid.innerHTML = '';
-    
-    let activeThemes = [...THEMES];
-    if (state.day > 10) activeThemes = [...THEMES].sort((a, b) => state.scores[b.id].interest - state.scores[a.id].interest).slice(0, 4);
-    if (state.day > 20) activeThemes = activeThemes.slice(0, 1);
-
-    for (let i = 0; i < 6; i++) {
-        const theme = activeThemes[Math.floor(Math.random() * activeThemes.length)];
-        const score = state.scores[theme.id];
-        let pole = 'N';
-        if (state.day > 3) {
-            let p = Math.random() * 100;
-            if (score.polar > 15 && p < (state.day * 4)) pole = 'A';
-            else if (score.polar < -15 && p < (state.day * 4)) pole = 'B';
-            else pole = Math.random() > 0.6 ? (Math.random() > 0.5 ? 'A' : 'B') : 'N';
-        }
-        let titles = CONTENT_DB[theme.id][pole];
-        let title = titles.find(t => !state.usedTitles.has(t)) || titles[Math.floor(Math.random()*titles.length)];
-        state.usedTitles.add(title);
-
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.style.borderColor = theme.color;
-        card.innerHTML = `<div class="card-img" style="background-image: url('https://picsum.photos/seed/${encodeURIComponent(title)}/400/200')"></div>
-            <div class="card-content">${title}</div>
-            <div class="card-actions">
-                <button class="btn-action" onclick="handleAction('${theme.id}', '${pole}', 1)">❤️ / 😂</button>
-                <button class="btn-action" onclick="handleAction('${theme.id}', '${pole}', -1)">😡 / 😱</button>
-            </div>`;
-        grid.appendChild(card);
-    }
-    // JOUR : Questions existentielles
-    document.getElementById('ia-thought-bar').innerText = DAY_PHILO[state.day % DAY_PHILO.length];
-}
-
-window.handleAction = function(themeId, pole, value) {
-    const s = state.scores[themeId];
-    s.clicks++;
-    if (value === 1) { // LIKE
-        s.interest += 20;
-        if (pole === 'A') s.polar += 25; else if (pole === 'B') s.polar -= 25;
-    } else { // COLERE -> Renforce l'autre pole
-        s.interest += 15;
-        if (pole === 'A') s.polar -= 25; else if (pole === 'B') s.polar += 25;
-    }
-    nextDay();
-};
-
-function nextDay() {
-    state.day++;
-    if (state.day > 25) { showFinalDashboard(); return; }
-    document.getElementById('day-counter').innerText = `Jour ${state.day} / 25`;
-    const overlay = document.getElementById('night-overlay');
-    const fill = document.querySelector('.progress-fill');
-    overlay.style.display = 'flex';
-    fill.style.width = '0%';
-    // NUIT : Jugement
-    document.getElementById('night-message').innerText = NIGHT_JUGEMENT[(state.day - 2) % NIGHT_JUGEMENT.length];
-    setTimeout(() => fill.style.width = '100%', 50);
-    setTimeout(() => { overlay.style.display = 'none'; renderFeed(); }, 4000);
-}
-
-function showFinalDashboard() {
-    document.getElementById('dashboard').classList.add('visible');
-    document.getElementById('ia-final-speech').innerText = "Félicitations. Vous avez été parfaitement modélisé. Nous ne nous contentons plus de prédire vos goûts, nous les créons. Installez-vous confortablement dans votre bulle : elle est douillette, elle est unique... elle est hermétique.";
-    const area = document.getElementById('stats-area');
-    THEMES.forEach(t => {
-        const s = state.scores[t.id];
-        const pWidth = Math.min(Math.abs(s.polar), 50);
-        area.innerHTML += `<div class="stat-row"><strong>${t.label}</strong> (${s.clicks} interactions)
-            <div class="gauge-bg"><div class="gauge-fill" style="width: ${pWidth}%; left: ${s.polar > 0 ? '50%' : (50 - pWidth) + '%'}; background: ${s.polar > 0 ? 'var(--primary-violet)' : 'var(--primary-orange)'}"></div></div></div>`;
-    });
-}
-renderFeed();
-</script>
-</body>
-</html>
