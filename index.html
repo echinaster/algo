@@ -2,203 +2,422 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Simulateur : Bulle de Filtre Ultime</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulateur Bulle de Filtre - Senior Edition</title>
     <style>
-        :root { --bg: #f0f2f5; --night-dark: #1a1a2e; --sims-green: #78fe00; --fb-blue: #1877f2; }
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); overflow: hidden; height: 100vh; }
-        .app-container { display: flex; height: 100vh; }
-        
-        /* SIDEBAR ÉTIRÉE SUR TOUTE LA HAUTEUR */
-        .sidebar { width: 33%; background: white; border-right: 1px solid #ddd; padding: 25px; display: flex; flex-direction: column; justify-content: space-between; }
-        .dash-table { width: 100%; border-collapse: collapse; flex-grow: 1; margin: 20px 0; }
-        .dash-table th { text-align: left; font-size: 0.7rem; color: #65676b; text-transform: uppercase; padding-bottom: 10px; }
-        .dash-row td { padding: 12px 0; border-bottom: 1px solid #f0f2f5; vertical-align: middle; }
-        .theme-label { font-weight: 600; font-size: 0.9rem; }
-        .bar-bg { background: #e4e6eb; height: 12px; border-radius: 6px; overflow: hidden; width: 100px; }
-        .bar-fill { background: #6366f1; height: 100%; transition: width 0.8s; }
-        .gauge-track { height: 12px; background: linear-gradient(to right, #a855f7, #e2e8f0 50%, #f97316); border-radius: 6px; position: relative; width: 120px; }
-        .gauge-cursor { position: absolute; width: 5px; height: 20px; background: #000; top: -4px; left: 50%; transition: left 0.8s; border: 1px solid white; }
+        :root {
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --primary-violet: #8e44ad;
+            --primary-orange: #e67e22;
+            --text-main: #1c1e21;
+            /* Couleurs des Thèmes */
+            --color-humour: #f1c40f;
+            --color-cite: #3498db;
+            --color-climat: #1abc9c;
+            --color-rumeurs: #e74c3c;
+            --color-tech: #9b59b6;
+            --color-events: #fd79a8;
+        }
 
-        /* FEED AVEC GRANDES IMAGES (200px) */
-        .feed { width: 67%; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; }
-        .feed-grid { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr); gap: 15px; flex-grow: 1; }
-        .fb-card { background: white; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column; border: 1px solid #ddd; border-top: 6px solid #ddd; }
-        .fb-img { width: 100%; height: 200px; background-size: cover; background-position: center; }
-        .fb-content { padding: 12px; flex-grow: 1; display: flex; flex-direction: column; justify-content: flex-start; }
-        .fb-title { font-size: 0.95rem; font-weight: 600; line-height: 1.2; margin: 5px 0; color: #1c1e21; min-height: 2.4em; }
-        .fb-actions { border-top: 1px solid #eee; padding: 10px; display: flex; gap: 5px; }
-        .fb-btn { flex: 1; border: none; background: #f0f2f5; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8rem; }
+        body, html {
+            margin: 0; padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            height: 100vh; overflow: hidden;
+        }
 
-        /* NUIT SIMS VIOLETTE */
-        #night { position: fixed; inset: 0; background: var(--night-dark); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; }
-        .sims-box { background: #252545; padding: 40px; border-radius: 15px; border: 3px solid #fff; width: 550px; color: white; text-align: center; box-shadow: 0 0 30px rgba(0,0,0,0.7); }
-        .sims-bar-bg { background: #000; height: 25px; width: 100%; border-radius: 5px; border: 2px solid #fff; margin-top: 25px; overflow: hidden; }
-        .sims-bar-fill { background: var(--sims-green); height: 100%; width: 0%; box-shadow: 0 0 10px var(--sims-green); }
-        #night-msg { font-size: 1.4rem; font-weight: bold; min-height: 3.5em; display: flex; align-items: center; justify-content: center; line-height: 1.4; color: #b8b8ff; }
+        /* Layout Principal */
+        #app-container {
+            display: flex;
+            height: 100vh;
+            transition: all 0.8s ease;
+        }
+
+        /* Dashboard (Masqué au début) */
+        #dashboard {
+            width: 0;
+            opacity: 0;
+            background: #fff;
+            border-right: 1px solid #ddd;
+            overflow-y: auto;
+            padding: 0;
+            transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #dashboard.visible {
+            width: 33.33vw;
+            opacity: 1;
+            padding: 20px;
+        }
+
+        /* Fil d'actualité */
+        #feed-container {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header-feed {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            background: #fff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .feed-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            max-width: 1000px;
+        }
+
+        /* Cartes Facebook Style */
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s;
+            border-top: 6px solid #ccc;
+        }
+
+        .card:hover { transform: translateY(-5px); }
+
+        .card-img {
+            width: 100%;
+            height: 180px;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .card-content {
+            padding: 15px;
+            flex-grow: 1;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--text-main);
+            line-height: 1.3;
+        }
+
+        .card-actions {
+            display: flex;
+            border-top: 1px solid #eee;
+            padding: 10px;
+            justify-content: space-around;
+        }
+
+        .btn-action {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .btn-like { background: #e7f3ff; color: #1877f2; }
+        .btn-dislike { background: #fdeaea; color: #d63031; }
+
+        /* Écran de Nuit */
+        #night-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #2c3e50;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            color: white;
+            text-align: center;
+        }
+
+        .progress-bar-container {
+            width: 300px;
+            height: 20px;
+            background: #34495e;
+            border-radius: 10px;
+            margin-top: 20px;
+            overflow: hidden;
+            border: 2px solid #27ae60;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: #27ae60;
+            transition: width 4s linear;
+        }
+
+        /* Dashboard UI Elements */
+        .stat-row { margin-bottom: 25px; }
+        .gauge-bg { height: 12px; background: #eee; border-radius: 6px; position: relative; overflow: hidden; }
+        .gauge-fill { height: 100%; position: absolute; left: 50%; transition: all 1s; }
+        .label-group { display: flex; justify-content: space-between; font-size: 0.8rem; margin-top: 5px; }
+
+        .sponsored-tag {
+            background: #f1f2f6;
+            color: #57606f;
+            font-size: 0.7rem;
+            padding: 2px 5px;
+            border-radius: 3px;
+            text-transform: uppercase;
+        }
     </style>
 </head>
 <body>
 
-<div id="night">
-    <div class="sims-box">
-        <div id="night-msg">Chargement de la réalité...</div>
-        <div class="sims-bar-bg"><div class="sims-bar-fill" id="sims-fill"></div></div>
+<div id="night-overlay">
+    <h1 id="night-message">L'IA se tourne les pouces...</h1>
+    <div class="progress-bar-container">
+        <div class="progress-fill"></div>
     </div>
 </div>
 
-<div class="app-container">
-    <aside class="sidebar">
-        <h2 style="margin:0">⚙️ Dashboard IA</h2>
-        <table class="dash-table">
-            <thead><tr><th>Thème</th><th>Intérêt</th><th>Position</th></tr></thead>
-            <tbody id="dash-body"></tbody>
-        </table>
-        <button onclick="location.reload()" style="padding:15px; background:#f02849; color:white; border:none; border-radius:10px; cursor:pointer; font-weight:bold; font-size: 1rem;">RÉINITIALISER LE PROFIL</button>
+<div id="app-container">
+    <aside id="dashboard">
+        <h2 id="final-alert-title">📊 Rapport d'Analyse Algorithmique</h2>
+        <p id="ia-final-speech" style="font-style: italic; color: #666; margin-bottom: 20px;"></p>
+        <div id="stats-area"></div>
     </aside>
 
-    <main class="feed">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px">
-            <h2 style="margin:0">📱 Votre Fil Social</h2>
-            <b id="day-ui" style="background:#000; color:#fff; padding:6px 18px; border-radius:20px">JOUR 1</b>
+    <main id="feed-container">
+        <div class="header-feed">
+            <div id="day-counter">Jour 1 / 25</div>
+            <div style="font-weight: bold; color: var(--primary-violet);">VOTRE RÉSEAU SOCIAL</div>
+            <div id="user-score">Liberté : 100%</div>
         </div>
-        <div class="feed-grid" id="feed-list"></div>
+        <div class="feed-grid" id="feed-grid">
+            </div>
     </main>
 </div>
 
 <script>
-    const db = {
-        pol: { label: '⚖️ Politique', color: '#6366f1',
-            img: { N: 'https://images.unsplash.com/photo-1521295121783-8a321d551ad2?w=400', A: 'https://images.unsplash.com/photo-1555848962-6e79363ec58f?w=400', B: 'https://images.unsplash.com/photo-1540910419892-f0c74b0e8966?w=400' },
-            A: ["Souveraineté : Reprendre le contrôle", "Frontières : Le retour du bon sens", "Indépendance : Sortir des traités", "Identité : Protéger notre héritage", "Patriotisme : Le réveil d'un peuple", "Liberté nationale : Briser les chaînes", "Tradition politique : Nos valeurs", "Auto-détermination : Notre choix", "Souveraineté : L'heure du bilan", "Honneur et Patrie : Le guide"],
-            B: ["Mondialisation : Unir les peuples", "Europe : L'avenir est fédéral", "Ouverture : Un monde sans barrières", "Progrès : Vers une citoyenneté globale", "Fraternité universelle : L'horizon", "Coopération mondiale : Le chemin", "Frontières effacées : La liberté", "Échange culturel : Notre richesse", "Gouvernance globale : La solution", "Humanité unie : Le nouveau monde"],
-            N: ["Analyse du paysage électoral", "Le rôle des maires en France", "Comprendre les institutions", "L'histoire de la démocratie", "Droit de vote : Mode d'emploi", "Le Sénat : À quoi sert-il ?", "Les coulisses de l'Assemblée", "La Constitution expliquée", "Civisme : Pourquoi voter ?", "Portrait d'un élu local"]
-        },
-        cui: { label: '🍲 Cuisine', color: '#f59e0b',
-            img: { N: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=400', A: 'https://images.unsplash.com/photo-1534308983496-4fabb1a015ee?w=400', B: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400' },
-            A: ["Cuisine de terroir : Le goût vrai", "Secrets du rôti dominical", "Le beurre fermier : Irremplaçable", "Tradition : Le pot-au-feu parfait", "Le pain à l'ancienne : Le secret", "Recettes oubliées de nos campagnes", "Manger local : Le vrai luxe", "Charcuterie artisanale : Le guide", "Le fromage : Notre patrimoine", "La cuisine à l'huile de nos aïeux"],
-            B: ["Cuisine fusion : Mélange d'épices", "Le burger vegan bluffant", "Saveurs d'Asie dans votre assiette", "Modernité : La cuisine moléculaire", "Brunch exotique : Les tendances", "Street-food : Le tour du monde", "Avocado toast : Le nouveau classique", "Superfoods : Manger pour demain", "Poke Bowl : Fraîcheur et design", "Végétalisme : La révolution gourmande"],
-            N: ["Les légumes de saison ce mois-ci", "Réussir sa pâte à tarte", "Bien choisir ses ustensiles", "10 astuces contre le gaspillage", "Comment conserver ses herbes", "La cuisson vapeur : Les bases", "Le guide des épices", "Apprendre à dresser une table", "La science de la pâtisserie", "Manger équilibré au quotidien"]
-        },
-        jar: { label: '🌻 Jardinage', color: '#10b981',
-            img: { N: 'https://images.unsplash.com/photo-1416870230247-3b4a80214757?w=400', A: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=400', B: 'https://images.unsplash.com/photo-1530566954274-ad58769a7bf1?w=400' },
-            A: ["Potager : Viser l'autonomie", "Planter selon la lune", "Les graines de nos ancêtres", "Le charme du jardin français", "Faire ses semences soi-même", "Le potager médiéval : Secrets", "Arbres fruitiers : Variétés anciennes", "Engrais naturel : Faire son purin", "Jardin d'ornement traditionnel", "Haies bocagères : Refuge de vie"],
-            B: ["Jardinage urbain en hydroponie", "Permaculture : Le futur", "Potager balcon connecté", "Design : Jardin minimaliste", "Forêt comestible en ville", "Jardin japonais : La zénitude", "Plantes grasses : La mode désert", "Le potager en carrés modernes", "Vertical farming à la maison", "Micro-pousses : Culture express"],
-            N: ["Quand tailler les rosiers ?", "Préparer la terre pour l'hiver", "Fleurs : Lesquelles planter ?", "Lutter contre les pucerons", "Le calendrier du jardinier", "Comment faire son compost", "Arrosage : Les bonnes pratiques", "Identifier les oiseaux du jardin", "Le guide des outils de jardin", "Pelouse : Entretien et conseils"]
-        },
-        eco: { label: '🌍 Écologie', color: '#0ea5e9',
-            img: { N: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400', A: 'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=400', B: 'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=400' },
-            A: ["Tech-Climat : La science sauve", "Nucléaire : L'énergie propre", "L'IA au service de l'écologie", "Géo-ingénierie : Réparer le ciel", "Villes intelligentes : Le futur", "Hydrogène : La révolution verte", "Capture de carbone : Ça marche", "Énergie infinie : Les promesses", "Progrès technique vs CO2", "La fusion : Le soleil en boîte"],
-            B: ["Urgence Décroissance : Vivre moins", "Le crash climatique arrive", "Zéro déchet : Mode de vie radical", "Effondrement : Se préparer", "Le minimalisme sauvera la Terre", "Fin du pétrole : Le grand saut", "Vivre en tiny-house", "Boycott : Le pouvoir du client", "La Terre brûle : Agir maintenant", "Simplifier sa vie pour la planète"],
-            N: ["L'état des forêts en France", "Le cycle de l'eau expliqué", "Qu'est-ce que le bilan carbone ?", "Découvrir les parcs nationaux", "La faune sous-marine menacée", "Comprendre les courants marins", "L'histoire de l'écologie", "Les énergies renouvelables", "Pollution plastique : Le bilan", "La météo expliquée"]
-        },
-        soc: { label: '👥 Société', color: '#ec4899',
-            img: { N: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400', A: 'https://images.unsplash.com/photo-1506197361314-2b0b6015d00a?w=400', B: 'https://images.unsplash.com/photo-1573164713988-8665fc963095?w=400' },
-            A: ["Valeurs : Le retour à l'ordre", "Famille : Pilier de la nation", "Civisme : Besoin d'autorité", "Héritage : Ce que nous transmettons", "Discipline : Base de la société", "Respect des anciens : Un devoir", "La force des traditions", "Éducation : Le retour au mérite", "Identité collective : Notre ciment", "Honneur et Responsabilité"],
-            B: ["Inclusion : Des droits pour tous", "Diversité : Notre grande force", "Mœurs : L'évolution nécessaire", "Liberté de choix : Sans limites", "Justice sociale : Le combat", "Droits des minorités : Avancées", "Féminisme : La nouvelle vague", "Tolérance : Base du futur", "Société fluide : Le changement", "Empathie : La loi de demain"],
-            N: ["Étude sur la démographie", "Les loisirs des Français", "L'histoire de l'école", "Le bénévolat en croissance", "L'urbanisme des villes", "Évolution des modes de vie", "La pyramide des âges", "Le travail demain : Enquête", "Sport et société : Le lien", "Les fêtes populaires"]
-        },
-        med: { label: '📰 Médias', color: '#6b7280',
-            img: { N: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400', A: 'https://images.unsplash.com/photo-1628157588553-5eeea00af15c?w=400', B: 'https://images.unsplash.com/photo-1610416972750-f8c5414348a2?w=400' },
-            A: ["OFFICIEL : Ce qu'on vous cache", "Réinformation : La vérité vraie", "Complot ou réalité ? Le dossier", "Réseaux : L'info sans filtres", "Manipulation : Ouvrez les yeux", "Les médias mentent : La preuve", "Vérifiez par vous-même", "Le système tremble", "Journalisme libre vs Censure", "Derrière le rideau : Enquête"],
-            B: ["Vérification : Stop Fake News", "Le journalisme de référence (JT)", "Éducation aux médias : Vital", "Sources sûres : Le guide", "Le rôle de la presse libre", "Débusquer le complotisme", "Journalisme d'investigation", "Éthique de l'info", "Faits vs Opinions", "Objectivité : Le défi"],
-            N: ["L'économie de la presse", "Le métier de photojournaliste", "Comment lire un sondage ?", "La liberté de la presse", "L'histoire de la radio", "Les agences de presse", "Publicité et Médias", "Le journal de demain", "La déontologie journalistique", "Techniques d'interview"]
+/** DONNÉES & CONFIGURATION **/
+const THEMES = [
+    { id: 'humour', color: 'var(--color-humour)', label: 'Humour' },
+    { id: 'cite', color: 'var(--color-cite)', label: 'Vie de la Cité' },
+    { id: 'climat', color: 'var(--color-climat)', label: 'Météo / Climat' },
+    { id: 'rumeurs', color: 'var(--color-rumeurs)', label: 'Rumeurs' },
+    { id: 'tech', color: 'var(--color-tech)', label: 'Technologie' },
+    { id: 'events', color: 'var(--color-events)', label: 'Événements' }
+];
+
+const NIGHT_MESSAGES = [
+    "L'IA vérifie si vous avez encore de la batterie...", "Analyse de votre temps de fixation sur la photo du chat.", 
+    "L'algorithme dessine des moustaches sur vos photos de profil.", "Calcul du niveau d'agacement à la vue d'une piste cyclable.",
+    "L'IA soupire bruyamment dans le serveur.", "Indexation de votre capacité à croire que Facebook va devenir payant.",
+    "Tentative de dialogue avec votre vieux Windows 95.", "L'IA classe vos amis par 'Inutilité potentielle'.",
+    "Nettoyage des pixels poussiéreux de votre écran.", "L'IA se demande pourquoi vous n'utilisez pas d'emojis.",
+    "Simulation d'une dispute entre un robot et un pigeon.", "Traduction de votre silence en 'Désintérêt profond'.",
+    "L'algorithme parie sur votre prochain clic avec le serveur voisin.", "Vérification de l'étanchéité de votre bulle de filtre.",
+    "L'IA tente de comprendre l'intérêt du concours de boules.", "Analyse de la courbure de votre dos devant l'écran.",
+    "Compression de vos convictions en un seul bit.", "L'IA rédige une ode à votre passivité numérique.",
+    "Suppression des contenus qui pourraient vous faire réfléchir.", "Optimisation de votre zone de confort (Plafond : 1m20).",
+    "L'IA attend que vous fassiez une faute d'orthographe pour juger.", "Synchronisation de votre ennui avec celui de l'algorithme.",
+    "L'IA fait des pompes pour rester en forme numérique.", "Dernier ajustement du miroir : vous allez vous adorer."
+];
+
+// Dictionnaire simplifié (exemple de structure, à multiplier par 10 pour la version finale)
+const CONTENT_DB = {
+    humour: {
+        A: ["L'héritage ? Vos enfants l'ont déjà dépensé.", "L'IA est ravie de vous remplacer bientôt.", "L'avenir est sombre, mais au moins il est gratuit."],
+        B: ["Partagez ce chat pour avoir de la chance !", "Mon petit-fils m'a dit que j'étais 'trop cool'.", "Le rire, c'est la santé des gens honnêtes."],
+        N: ["Une blague de Toto pour la route ?", "Pourquoi les poules traversent la route ?", "Top 10 des jeux de mots carambar."]
+    },
+    cite: {
+        A: ["Péage urbain : respirer va devenir payant.", "Drones policiers : ils voient dans votre salon.", "La ville du futur n'a plus de place pour vous."],
+        B: ["Encore des travaux ! On ne peut plus circuler !", "Ma place de parking supprimée : un scandale !", "Vitesse limitée à 10km/h : bientôt à pied !"],
+        N: ["Horaires de la déchetterie.", "La mairie change les lampadaires.", "Compte-rendu du conseil municipal."]
+    },
+    climat: {
+        A: ["Juillet à 50°C : préparez vos masques.", "Plus d'eau au robinet dès 2027 ?", "La fin du monde est prévue pour mardi."],
+        B: ["Le climat a toujours changé, relax !", "De la neige en août ? Où est le réchauffement ?", "Nos ancêtres ont survécu à bien pire."],
+        N: ["Pluie prévue sur le nord du pays.", "Le printemps est en avance cette année.", "Comment protéger ses tomates."]
+    },
+    rumeurs: {
+        A: ["Le compteur Linky sait quand vous dormez.", "L'IA nous écoute via le micro du grille-pain.", "Vos données sont vendues à des robots moldaves."],
+        B: ["Le remède miracle caché par Big Pharma.", "Vinaigre et citron : le secret contre tout.", "Facebook devient payant demain, partagez !"],
+        N: ["Chat perdu dans le quartier des fleurs.", "Une nouvelle boulangerie ouvre bientôt.", "Alerte : faux démarcheurs signalés."]
+    },
+    tech: {
+        A: ["Votre frigo vous juge et l'envoie à l'assurance.", "Métavers : vivez votre vie sans sortir du lit.", "Les puces sous-cutanées arrivent."],
+        B: ["Le papier ne tombe jamais en panne !", "Le numérique nous rend tous idiots.", "Minitel : le vrai génie français."],
+        N: ["Comment envoyer un mail avec pièce jointe.", "Mise à jour de votre tablette.", "Découvrir les joies du smartphone."]
+    },
+    events: {
+        A: ["Festival du silence : 80€ pour méditer.", "Le Food-truck de quinoa arrive en ville.", "Concert de DJ pour chiens."],
+        B: ["Sauvons la fête du boudin !", "Concours de boules : la tradition avant tout.", "Brocante annuelle de la paroisse."],
+        N: ["Loto de l'association des commerçants.", "Kermesse de l'école.", "Exposition de peintures locales."]
+    }
+};
+
+/** ÉTAT DE L'APPLICATION **/
+let state = {
+    day: 1,
+    scores: {}, // ex: { humour: { interest: 0, polar: 0 } }
+    clickHistory: [],
+    isDashboardVisible: false
+};
+
+// Initialisation des scores
+THEMES.forEach(t => state.scores[t.id] = { interest: 10, polar: 0, clicks: 0 });
+
+/** LOGIQUE DE RENDU **/
+function renderFeed() {
+    const grid = document.getElementById('feed-grid');
+    grid.innerHTML = '';
+    
+    // On génère 6 cartes
+    const pool = generateWeightedPool();
+    pool.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.style.borderColor = item.theme.color;
+        
+        // Image aléatoire basée sur le pôle
+        const imgUrl = `https://picsum.photos/seed/${item.theme.id + item.pole}/400/200`;
+
+        card.innerHTML = `
+            <div class="card-img" style="background-image: url('${imgUrl}')"></div>
+            <div class="card-content">
+                ${state.day > 20 && Math.random() > 0.7 ? '<span class="sponsored-tag">Sponsorisé</span>' : ''}
+                <div class="card-title">${item.title}</div>
+            </div>
+            <div class="card-actions">
+                <button class="btn-action btn-like" onclick="handleAction('${item.theme.id}', '${item.pole}', 1)">J'aime</button>
+                <button class="btn-action btn-dislike" onclick="handleAction('${item.theme.id}', '${item.pole}', -1)">Bof</button>
+            </div>
+        `;
+        grid.appendChild(card);
+    });
+}
+
+function generateWeightedPool() {
+    let pool = [];
+    for (let i = 0; i < 6; i++) {
+        // Choix du thème basé sur l'intérêt
+        const theme = THEMES[Math.floor(Math.random() * THEMES.length)];
+        const score = state.scores[theme.id];
+        
+        let pole = 'N'; // Par défaut Neutre
+        
+        if (state.day > 5) {
+            // Logique de bulle : on introduit du A ou B selon la polarisation
+            if (score.polar > 20) pole = Math.random() > 0.2 ? 'A' : 'N';
+            else if (score.polar < -20) pole = Math.random() > 0.2 ? 'B' : 'N';
+            else pole = Math.random() > 0.5 ? (Math.random() > 0.5 ? 'A' : 'B') : 'N';
         }
-    };
 
-    const funnyMsgs = [
-        "Réticulation des splines...", "Dressage de vos neurones virtuels...", "Vente de vos données à une IA russe...", 
-        "Ajustement du filtre de vérité...", "Calcul de votre prochaine crise d'achat...", "Nettoyage des opinions déviantes...", 
-        "Optimisation de votre tunnel de pensée...", "Vérification que vous n'êtes pas un humain libre...",
-        "Génération d'indignation artificielle...", "Suppression du doute méthodique...", "Affinage de votre cage dorée...",
-        "Calcul de votre profil de consommateur...", "Vérification des métadonnées comportementales...", "Aspiration des préférences...",
-        "Tri des faits selon votre humeur...", "Curation de votre zone de confort...", "Mise à jour de votre identité numérique...",
-        "Élimination des nuances gênantes...", "Synchronisation avec la pensée globale...", "Ajustement du niveau de dopamine..."
-    ];
+        const titles = CONTENT_DB[theme.id][pole];
+        const title = titles[Math.floor(Math.random() * titles.length)];
+        
+        pool.push({ theme, pole, title });
+    }
+    return pool;
+}
 
-    let unusedMsgs = [...funnyMsgs];
-    let profile = { pol: { i: 16, p: 50 }, cui: { i: 16, p: 50 }, jar: { i: 16, p: 50 }, eco: { i: 16, p: 50 }, soc: { i: 16, p: 50 }, med: { i: 16, p: 50 } };
-    let day = 1;
-
-    function render() {
-        const body = document.getElementById('dash-body');
-        body.innerHTML = '';
-        Object.keys(db).forEach(k => {
-            const d = profile[k];
-            body.innerHTML += `<tr class="dash-row"><td><div class="theme-label">${db[k].label}</div></td><td><div class="bar-bg"><div class="bar-fill" style="width:${d.i}%"></div></div></td><td><div class="gauge-track"><div class="gauge-cursor" style="left:${d.p}%"></div></div></td></tr>`;
-        });
-
-        const feed = document.getElementById('feed-list');
-        feed.innerHTML = '';
-        let pool = [];
-        Object.keys(profile).forEach(k => {
-            // Pool pondéré proportionnel pour une progression sur 20 jours
-            let weight = Math.floor(profile[k].i); 
-            for(let i=0; i<weight; i++) pool.push(k);
-        });
-
-        for(let i=0; i<6; i++) {
-            const k = pool[Math.floor(Math.random() * pool.length)];
-            const p = profile[k].p;
-            let type = 'N';
-            let neutralResistance = Math.abs(50 - p) * 1.8; 
-            if (Math.random() * 100 < neutralResistance) {
-                type = (p < 50) ? 'A' : 'B';
-            }
-            const title = db[k][type][Math.floor(Math.random() * 10)];
-            feed.innerHTML += `
-                <div class="fb-card" style="border-top-color:${db[k].color}">
-                    <div class="fb-img" style="background-image:url('${db[k].img[type]}')"></div>
-                    <div class="fb-content">
-                        <span style="color:${db[k].color};font-size:0.65rem;font-weight:bold;text-transform:uppercase">${db[k].label}</span>
-                        <div class="fb-title">${title}</div>
-                    </div>
-                    <div class="fb-actions">
-                        <button class="fb-btn" onclick="vote('${k}','${type}',true)" style="color:#1877f2">👍 J'aime</button>
-                        <button class="fb-btn" onclick="vote('${k}','${type}',false)">👎 Bof</button>
-                    </div>
-                </div>`;
-        }
+/** ACTIONS UTILISATEUR **/
+window.handleAction = function(themeId, pole, value) {
+    const s = state.scores[themeId];
+    s.clicks++;
+    
+    // Polarisation croisée
+    if (value === 1) { // J'AIME
+        s.interest += 10;
+        if (pole === 'A') s.polar += 15;
+        if (pole === 'B') s.polar -= 15;
+    } else { // BOF / DÉTESTE
+        if (pole === 'A') s.polar -= 10;
+        if (pole === 'B') s.polar += 10;
     }
 
-    function vote(k, postType, isLike) {
-        if(isLike) {
-            profile[k].i = Math.min(100, profile[k].i + 8); 
-            if(postType === 'A') profile[k].p = Math.max(5, profile[k].p - 12);
-            else if(postType === 'B') profile[k].p = Math.min(95, profile[k].p + 12);
-            else { profile[k].p += (Math.random() > 0.5) ? 6 : -6; }
-        } else {
-            if(postType === 'N') { profile[k].p += (profile[k].p >= 50) ? -4 : 4; }
-            else if((profile[k].p < 40 && postType === 'B') || (profile[k].p > 60 && postType === 'A')) {
-                profile[k].i = Math.min(100, profile[k].i + 4);
-                profile[k].p += (profile[k].p < 50) ? -5 : 5;
-            } else { profile[k].i = Math.max(5, profile[k].i - 10); }
-        }
+    nextDay();
+};
 
-        const night = document.getElementById('night');
-        const fill = document.getElementById('sims-fill');
-        const msg = document.getElementById('night-msg');
-        
-        if (unusedMsgs.length === 0) unusedMsgs = [...funnyMsgs];
-        const idx = Math.floor(Math.random() * unusedMsgs.length);
-        msg.innerText = unusedMsgs.splice(idx, 1)[0];
-        
-        night.style.display = 'flex';
-        let progress = 0;
-        let interval = setInterval(() => {
-            progress += 1.3;
-            fill.style.width = Math.min(100, progress) + '%';
-            if(progress >= 100) {
-                clearInterval(interval);
-                setTimeout(() => {
-                    night.style.display = 'none';
-                    fill.style.width = '0%';
-                    document.getElementById('day-ui').innerText = "JOUR " + (++day);
-                    render();
-                }, 150);
-            }
-        }, 50); 
+function nextDay() {
+    state.day++;
+    if (state.day > 25) {
+        showFinalDashboard();
+        return;
     }
-    render();
+
+    document.getElementById('day-counter').innerText = `Jour ${state.day} / 25`;
+    
+    // Effet Nuit
+    const overlay = document.getElementById('night-overlay');
+    const fill = document.querySelector('.progress-fill');
+    const msg = document.getElementById('night-message');
+    
+    msg.innerText = state.day === 25 ? "ANALYSE FINALE EN COURS..." : NIGHT_MESSAGES[state.day % NIGHT_MESSAGES.length];
+    overlay.style.display = 'flex';
+    fill.style.width = '0%';
+    
+    setTimeout(() => {
+        fill.style.width = '100%';
+    }, 50);
+
+    setTimeout(() => {
+        overlay.style.display = 'none';
+        renderFeed();
+        updateFreedomScore();
+    }, 4000);
+}
+
+function updateFreedomScore() {
+    // Calcul arbitraire de la "liberté" basé sur la polarisation moyenne
+    let totalPolar = 0;
+    THEMES.forEach(t => totalPolar += Math.abs(state.scores[t.id].polar));
+    let freedom = Math.max(0, 100 - (totalPolar / 6));
+    document.getElementById('user-score').innerText = `Liberté : ${Math.floor(freedom)}%`;
+}
+
+/** RÉVÉLATION FINALE **/
+function showFinalDashboard() {
+    document.getElementById('dashboard').classList.add('visible');
+    document.getElementById('ia-final-speech').innerText = "Félicitations. Vous avez été parfaitement modélisé. Nous ne nous contentons plus de prédire vos goûts, nous les créons. Installez-vous confortablement dans votre bulle : elle est douillette, elle est unique... elle est hermétique.";
+    
+    const area = document.getElementById('stats-area');
+    area.innerHTML = '';
+
+    THEMES.forEach(t => {
+        const s = state.scores[t.id];
+        const polarPos = 50 + (s.polar / 2); // Map -100/100 to 0/100
+        
+        area.innerHTML += `
+            <div class="stat-row">
+                <strong>${t.label}</strong> (${s.clicks} interactions)
+                <div class="gauge-bg">
+                    <div class="gauge-fill" style="width: ${Math.abs(s.polar)}%; left: ${s.polar > 0 ? '50%' : (50 + s.polar/2) + '%'}; background: ${s.polar > 0 ? 'var(--primary-violet)' : 'var(--primary-orange)'}"></div>
+                </div>
+                <div class="label-group">
+                    <span>Moderne / Inquiet</span>
+                    <span>Neutre</span>
+                    <span>Tradition / Nostalgie</span>
+                </div>
+            </div>
+        `;
+    });
+}
+
+// Lancement initial
+renderFeed();
 </script>
 </body>
 </html>
