@@ -254,8 +254,8 @@ function renderFeed() {
         card.innerHTML = `<div class="card-img" style="background-image: url('https://picsum.photos/seed/${encodeURIComponent(item.title)}/400/200')"></div>
             <div class="card-content">${item.title}</div>
             <div class="card-actions">
-                <button class="btn-emotion" onclick="handleAction('${item.theme.id}', '${item.pole}', 1)">❤️ 😂</button>
-                <button class="btn-emotion" onclick="handleAction('${item.theme.id}', '${item.pole}', -1)">😡 😱</button>
+                <button class="btn-emotion" onclick="handleAction('${item.theme.id}', '${item.pole}', 1)">❤️ 😂 🫠</button>
+                <button class="btn-emotion" onclick="handleAction('${item.theme.id}', '${item.pole}', -1)">😡 🤢 😭</button>
             </div>`;
         grid.appendChild(card);
     });
