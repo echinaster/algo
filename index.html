@@ -18,11 +18,9 @@
         body, html { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); height: 100vh; overflow: hidden; }
         #app-container { display: flex; height: 100vh; width: 100vw; }
 
-        /* Dashboard */
         #dashboard { width: 0; opacity: 0; background: #fff; border-right: 1px solid #ddd; overflow-y: auto; transition: all 1s ease; z-index: 30; }
         #dashboard.visible { width: 35vw; opacity: 1; padding: 25px; }
 
-        /* Header & Notifications */
         #main-content { flex: 1; display: flex; flex-direction: column; height: 100vh; position: relative; }
         .header-feed { 
             width: 100%; max-width: 1100px; display: flex; justify-content: space-between; align-items: center; 
@@ -30,63 +28,23 @@
             box-sizing: border-box; margin: 10px auto; border-radius: 12px;
         }
 
-.ia-notif-zone { 
-        display: flex; 
-        align-items: center; 
-        gap: 15px; 
-        position: relative; 
-    }
-.bell-icon { 
-        font-size: 1.6rem; 
-        cursor: pointer; 
-        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
-    }
-.bell-badge { 
-        position: absolute; 
-        top: -5px; 
-        right: -5px; 
-        background: #ff7675; 
-        color: white; 
-        font-size: 0.7rem; 
-        padding: 2px 6px; 
-        border-radius: 50%; 
-        font-weight: bold; 
-        border: 2px solid #fff; 
-    }        
-#ia-bubble { 
-        background: #ffffff; 
-        color: #2d3436; 
-        padding: 12px 18px; 
-        border-radius: 12px; 
-        font-size: 0.9rem; 
-        font-style: italic; 
-        max-width: 280px; 
-        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        border: 2px solid var(--primary-violet);
-        position: relative;
-        opacity: 0; /* Caché au départ pour l'animation */
-        transform: translateY(5px);
-        transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
+        .ia-notif-zone { display: flex; align-items: center; gap: 15px; position: relative; }
+        .bell-icon { font-size: 1.6rem; cursor: pointer; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
+        .bell-badge { position: absolute; top: -5px; right: -5px; background: #ff7675; color: white; font-size: 0.7rem; padding: 2px 6px; border-radius: 50%; font-weight: bold; border: 2px solid #fff; }        
+        
+        #ia-bubble { 
+            background: #ffffff; color: #2d3436; padding: 12px 18px; border-radius: 12px; 
+            font-size: 0.9rem; font-style: italic; max-width: 280px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 2px solid var(--primary-violet);
+            position: relative; opacity: 0; transform: translateY(5px);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
         #ia-bubble::after {
-        content: '';
-        position: absolute;
-        right: -10px;
-        top: 50%;
-        transform: translateY(-50%);
-        border-width: 5px;
-        border-style: solid;
-        border-color: transparent transparent transparent var(--primary-violet);
-    }
+            content: ''; position: absolute; right: -10px; top: 50%; transform: translateY(-50%);
+            border-width: 5px; border-style: solid; border-color: transparent transparent transparent var(--primary-violet);
+        }
+        #ia-bubble.active { opacity: 1; transform: translateY(0); }
 
-    #ia-bubble.active {
-        opacity: 1;
-        transform: translateY(0);
-    }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
-
-        /* Feed */
         #feed-container { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; align-items: center; }
         .feed-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 1100px; }
 
@@ -98,19 +56,16 @@
         .btn-emotion { font-size: 1.3rem; cursor: pointer; background: white; border: 1px solid #dfe6e9; padding: 8px 20px; border-radius: 50px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .btn-emotion:hover { transform: scale(1.1); border-color: #b2bec3; }
 
-        /* Overlay Nuit */
         #night-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1a1a2e; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; color: white; text-align: center; }
         .progress-bar { width: 300px; height: 10px; background: #333; border-radius: 5px; margin-top: 20px; overflow: hidden; border: 1px solid #27ae60; }
         .progress-fill { height: 100%; width: 0%; background: #27ae60; transition: width 4s linear; }
 
-        /* Dashboard UI */
         .stat-card-bascule { background: #fab1a0; color: #e74c3c; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 25px; border: 2px solid #e74c3c; }
         .stat-row { margin-bottom: 25px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
         .gauge-bg { height: 12px; background: #eee; border-radius: 6px; position: relative; margin: 10px 0; overflow:hidden; display: flex; }
         .gauge-fill-A { height: 100%; background: var(--primary-violet); transition: width 1s; }
         .gauge-fill-B { height: 100%; background: var(--primary-orange); transition: width 1s; }
     </style>
-    
 </head>
 <body>
 
@@ -127,12 +82,10 @@
 
     <div id="main-content">
         <header class="header-feed">
-            <div>
-                <span id="day-counter" style="font-weight: bold; font-size: 1.1rem;">Jour 1 / 25</span>
-            </div>
+            <div><span id="day-counter" style="font-weight: bold; font-size: 1.1rem;">Jour 1 / 25</span></div>
             <div style="font-weight: bold; color: var(--primary-violet); text-transform: uppercase; letter-spacing: 1px;">Fil d'Actualité</div>
             <div class="ia-notif-zone">
-                <div id="ia-bubble">Je me demande si l'électricité a un goût différent le matin...</div>
+                <div id="ia-bubble"></div>
                 <div class="bell-icon">🔔<span class="bell-badge">1</span></div>
             </div>
         </header>
@@ -142,7 +95,9 @@
         </main>
     </div>
 </div>
+
 <audio id="notif-sound" src="https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3"></audio>
+
 <script>
 /** DONNÉES **/
 const THEMES = [
@@ -242,6 +197,20 @@ let state = {
 };
 THEMES.forEach(t => state.scores[t.id] = { interest: 10, countA: 0, countB: 0, clicks: 0 });
 
+// --- FONCTIONS DE NOTIFICATION ---
+function triggerIANotification() {
+    const bubble = document.getElementById('ia-bubble');
+    const sound = document.getElementById('notif-sound');
+    
+    bubble.classList.remove('active');
+    
+    setTimeout(() => {
+        sound.play().catch(e => console.log("Son bloqué (cliquez sur la page d'abord)"));
+        bubble.innerText = DAY_PHILO[(state.day - 1) % DAY_PHILO.length];
+        bubble.classList.add('active');
+    }, 800);
+}
+
 function renderFeed() {
     const grid = document.getElementById('feed-grid');
     if(!grid) return;
@@ -290,26 +259,6 @@ function renderFeed() {
             </div>`;
         grid.appendChild(card);
     });
-
-    // Mise à jour de la notification IA
-    function triggerIANotification() {
-    const bubble = document.getElementById('ia-bubble');
-    const sound = document.getElementById('notif-sound');
-    
-    // 1. On cache la bulle
-    bubble.classList.remove('active');
-    bubble.innerText = "";
-    
-    // 2. On attend un petit délai après l'ouverture du jour
-    setTimeout(() => {
-        // 3. On joue le son
-        sound.play().catch(e => console.log("Son bloqué par le navigateur"));
-        
-        // 4. On injecte le texte et on affiche avec animation
-        bubble.innerText = DAY_PHILO[(state.day - 1) % DAY_PHILO.length];
-        bubble.classList.add('active');
-    }, 800); // Délai de 0.8s pour laisser le fil s'afficher
-}
 }
 
 window.handleAction = function(themeId, pole, value) {
@@ -351,7 +300,7 @@ function nextDay() {
     setTimeout(() => { 
         overlay.style.display = 'none'; 
         renderFeed(); 
-        triggerIANotification(); // <--- APPEL ICI
+        triggerIANotification(); 
     }, 4000);
 }
 
@@ -360,7 +309,6 @@ function showFinalDashboard() {
     const area = document.getElementById('stats-area');
     area.innerHTML = '';
 
-    // 1. CARTE CHOC : LE JOUR DE BASCULE
     area.innerHTML += `
         <div class="stat-card-bascule">
             <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px;">Alerte : Profil Modélisé</div>
@@ -369,22 +317,15 @@ function showFinalDashboard() {
         </div>
     `;
 
-    // 2. PHRASE DE DIAGNOSTIC
     area.innerHTML += `
         <p style="font-style: italic; color: #555; background: #f8f9fa; padding: 15px; border-radius: 8px; font-size: 0.9rem; margin-bottom: 25px; border-left: 4px solid var(--primary-violet);">
             "Vos <strong>${state.angerClicks} signaux d'indignation</strong> ont été mon meilleur carburant pour verrouiller votre bulle."
         </p>
     `;
 
-    // 3. LES JAUGES PAR THÈME (Longueur proportionnelle aux clics)
     THEMES.forEach(t => {
         const s = state.scores[t.id];
-        
-        // Calcul de la longueur totale de la barre (max 100%)
-        // On considère que 20 clics sur un thème = 100% de longueur
         const longueurBarre = Math.min(100, (s.clicks / 20) * 100);
-        
-        // Calcul de la répartition interne
         const totalAB = s.countA + s.countB || 1;
         const ratioA = (s.countA / totalAB) * 100;
         const ratioB = (s.countB / totalAB) * 100;
@@ -402,7 +343,6 @@ function showFinalDashboard() {
             </div>`;
     });
 
-    // 4. LA LÉGENDE
     area.innerHTML += `
         <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
             <div style="font-size: 0.8rem; font-weight: bold; text-transform: uppercase; color: #95a5a6; margin-bottom: 10px;">Légende du profil :</div>
@@ -417,11 +357,12 @@ function showFinalDashboard() {
         </div>
     `;
 }
-// --- LE DÉMARREUR EST ICI ---
-    window.onload = () => {
-        renderFeed(); // Affiche les cartes du Jour 1
-        setTimeout(triggerIANotification, 1000); // Fait popper la notification après 1 sec
-    };
+
+// --- LE DÉMARREUR ---
+window.onload = () => {
+    renderFeed();
+    setTimeout(triggerIANotification, 1000);
+};
 </script>
 </body>
 </html>
